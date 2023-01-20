@@ -2,9 +2,8 @@ import { Module } from '@nestjs/common';
 import { BotService } from './bot.service';
 import * as LocalSession from 'telegraf-session-local';
 import { TelegrafModule } from 'nestjs-telegraf';
-import { CurrenciesModule } from '../currencies/currencies.module';
-import { CurrencySum } from "./classes/currency_sum";
-
+import { CurrenciesSum } from './classes/currencies_sum';
+import { PostgresModule } from '../postgres/postgres.module';
 
 const sessions = new LocalSession({ database: 'session.json' });
 @Module({
@@ -15,8 +14,8 @@ const sessions = new LocalSession({ database: 'session.json' });
         middlewares: [sessions.middleware()],
       }),
     }),
-    CurrenciesModule,
+    PostgresModule,
   ],
-  providers: [BotService, CurrencySum],
+  providers: [BotService, CurrenciesSum],
 })
 export class BotModule {}

@@ -5,25 +5,23 @@ import {
   Ctx,
   Help,
   InjectBot,
-  Message,
-  On,
   Start,
   Update,
 } from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
 import { Buttons } from './classes/buttons';
-import { CurrenciesService } from '../currencies/currencies.service';
-import { map } from 'rxjs';
+import { PostgresService } from '../postgres/postgres.service';
+import { Currencies } from '../postgres/entities/currencies';
 
 @Injectable()
 @Update()
 export class BotService {
-  private _currency: CurrenciesService;
+  private _postgres: PostgresService;
   constructor(
     @InjectBot() private bot: Telegraf<Context>,
-    currency: CurrenciesService,
+    postgres: PostgresService,
   ) {
-    this._currency = currency;
+    this._postgres = postgres;
   }
 
   @Start()
@@ -56,23 +54,19 @@ export class BotService {
     await ctx.reply('👍');
   }*/
 
-  /*@Action('azn')
-  async getAzn(@Ctx() ctx: Context) {
-    await ctx.reply('azn');
-  }*/
   @Action('currencies')
   async getCurrencies(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
     await ctx.reply('Вот актуальные курсы:');
-    return this._currency.getCurrenciesFromFreeAPI().pipe(
-      map((value: { couple: string; date: string; price: number }[]) => {
-        value.map(async (val: { couple: string; price: number }) => {
+    return await this._postgres
+      .fetchData()
+      .then(async (value: Currencies[]) => {
+        value.map(async (val: Currencies) => {
           return await ctx.reply(`Валютная пара: ${val.couple}
         Курс: ${val.price}
         `);
         });
-      }),
-    );
+      });
   }
 
   @Action('currencies_sum')
