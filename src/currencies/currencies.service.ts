@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { combineLatestAll, map, mergeMap, Observable, of } from 'rxjs';
-import { DateTime } from 'luxon';
+
 @Injectable()
 export class CurrenciesService {
   constructor(private httpService: HttpService) {}
@@ -24,11 +24,10 @@ export class CurrenciesService {
       'rub/usd',
       'rub/eur',
     ];
-    const cur_date = DateTime.local();
-    const date = cur_date.toFormat('yyyy-MM-dd');
+
     const currencyArr = [];
     for (const currency in currencies) {
-      const freeAPI = `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/${date}/currencies/${currencies[currency]}.min.json`;
+      const freeAPI = `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${currencies[currency]}.json`;
       currencyArr.push(freeAPI);
     }
 

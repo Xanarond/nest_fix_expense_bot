@@ -7,6 +7,10 @@ import { CurrenciesModule } from './currencies/currencies.module';
 import { PostgresModule } from './postgres/postgres.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Currencies } from './postgres/entities/currencies';
+import { TelegramUsers } from './postgres/entities/telegram_users';
+import { Categories } from './postgres/entities/categories';
+import { Costs } from './postgres/entities/costs';
+import { Budgets } from './postgres/entities/budgets';
 
 @Module({
   imports: [
@@ -21,7 +25,7 @@ import { Currencies } from './postgres/entities/currencies';
       username: process.env.DB_LOGIN,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_MAIN,
-      entities: [Currencies],
+      entities: [Currencies, TelegramUsers, Categories, Costs, Budgets],
       synchronize: true,
     }),
   ],

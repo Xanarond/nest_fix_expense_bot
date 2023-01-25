@@ -1,12 +1,15 @@
 import { Markup } from 'telegraf';
 
 export class Buttons {
-  static createButtons() {
+  static startupButtons() {
     return Markup.keyboard(
       [
-        Markup.button.callback('Актуальные курсы валют', 'hello'),
-        Markup.button.callback('hi', 'hello'),
-        Markup.button.callback('Получить', 'hello'),
+        Markup.button.callback(
+          'Получение или расчет суммы курсов валют',
+          'currency',
+        ),
+        Markup.button.callback('Учёт расходов', 'expenses'),
+        Markup.button.callback('Ведение бюджета', 'budget'),
       ],
       {
         columns: 2,
@@ -39,6 +42,22 @@ export class Buttons {
       },
     );
   }
+
+  static showExpensesMenu() {
+    return Markup.inlineKeyboard(
+      [
+        Markup.button.callback('Добавление расходов', 'add_expense'),
+        Markup.button.callback('Отображение расходов', 'show_expenses'),
+        Markup.button.callback('Редактировать расходы', 'update_expense'),
+        Markup.button.callback('Добавить категорию расходов', 'add_category'),
+        Markup.button.callback('Редактировать категорию', 'update_category'),
+      ],
+      {
+        columns: 3,
+      },
+    );
+  }
+
   static closeButtons() {
     return Markup.removeKeyboard();
   }

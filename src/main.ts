@@ -8,6 +8,7 @@ import { getBotToken } from 'nestjs-telegraf';
 import { config } from 'dotenv';
 
 config();
+
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
@@ -17,4 +18,5 @@ async function bootstrap() {
   app.use(bot.webhookCallback('/secret-path'));
   await app.listen(3000);
 }
+
 bootstrap();

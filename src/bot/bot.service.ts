@@ -1,22 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import {
-  Action,
-  Command,
-  Ctx,
-  Help,
-  InjectBot,
-  Start,
-  Update,
-} from 'nestjs-telegraf';
+import { Command, Ctx, Help, InjectBot, Start, Update } from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
 import { Buttons } from './classes/buttons';
 import { PostgresService } from '../postgres/postgres.service';
-import { Currencies } from '../postgres/entities/currencies';
+import { TelegramUsers } from '../postgres/entities/telegram_users';
 
 @Injectable()
 @Update()
 export class BotService {
   private _postgres: PostgresService;
+
   constructor(
     @InjectBot() private bot: Telegraf<Context>,
     postgres: PostgresService,
@@ -26,8 +19,24 @@ export class BotService {
 
   @Start()
   async start(@Ctx() ctx: Context) {
-    await ctx.reply('bot', Buttons.createButtons());
+    const telegram_user: TelegramUsers = new TelegramUsers();
+    telegram_user.telegram_id = ctx.message.from.id;
+    telegram_user.first_name = ctx.message.from.first_name;
+    telegram_user.username = ctx.message.from.username;
+    telegram_user.last_name = ctx.message.from.last_name || null;
+    telegram_user.is_premium = ctx.message.from.is_premium || false;
+
+    await this._postgres.loginTelegramBot(telegram_user);
+
+    await ctx.replyWithHTML(
+      `<b>Добро пожаловать ${telegram_user.first_name} ${
+        telegram_user.last_name || ''
+      } в бот подсчета расходов</b> \n`,
+      Buttons.startupButtons(),
+    );
+    // await ctx.reply('bot', Buttons.createButtons());
   }
+
   @Help()
   async help(@Ctx() ctx: Context) {
     await ctx.replyWithHTML(
@@ -37,14 +46,11 @@ export class BotService {
         '3. ..... \n',
     );
   }
-  @Command('commands')
-  async getCommands(@Ctx() ctx: Context) {
-    await ctx.reply('Вот основные команды:', Buttons.showCommandsMenu());
-  }
   @Command('hello')
   async hey(@Ctx() ctx: Context) {
     await ctx.reply('Добро пожаловать в бот по расчету расходов');
   }
+
   /*  @Hears('currencies')
   async hears(@Ctx() ctx: Context) {
     await ctx.reply('вот курсы');
@@ -53,28 +59,6 @@ export class BotService {
   async on(@Ctx() ctx: Context) {
     await ctx.reply('👍');
   }*/
-
-  @Action('currencies')
-  async getCurrencies(@Ctx() ctx: Context) {
-    await ctx.deleteMessage();
-    await ctx.reply('Вот актуальные курсы:');
-    return await this._postgres
-      .fetchData()
-      .then(async (value: Currencies[]) => {
-        value.map(async (val: Currencies) => {
-          return await ctx.reply(`Валютная пара: ${val.couple}
-        Курс: ${val.price}
-        `);
-        });
-      });
-  }
-
-  @Action('currencies_sum')
-  async getCurrenciesSum(@Ctx() ctx: Context) {
-    await ctx.deleteMessage();
-    await ctx.reply('Введите текущюю валюту:', Buttons.showValuteMenu());
-    // await ctx.sendMessage('');
-  }
 
   /* @On('text')
   async getEcho(@Ctx() ctx: Context) {
