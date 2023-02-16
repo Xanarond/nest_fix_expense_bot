@@ -5,13 +5,13 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { Costs } from './costs';
+import { CostsEntity } from './costs.entity';
 
-@Entity()
+@Entity('categories')
 @Unique(['category'])
-export class Categories {
+export class CategoriesEntity {
   @PrimaryGeneratedColumn('increment')
-  @OneToMany(() => Costs, (costs) => costs.cost_id)
+  @OneToMany(() => CostsEntity, (costs) => costs.cost_id)
   category_id: number;
 
   @Column()

@@ -1,11 +1,11 @@
 import { Column, Entity, OneToMany, PrimaryColumn, Unique } from 'typeorm';
-import { Costs } from './costs';
+import { CostsEntity } from './costs.entity';
 
-@Entity()
+@Entity('telegram_users')
 @Unique(['telegram_id'])
 export class TelegramUsers {
   @PrimaryColumn({ type: 'bigint' })
-  @OneToMany(() => Costs, (costs) => costs.telegram_user_id)
+  @OneToMany(() => CostsEntity, (costs) => costs.telegram_user_id)
   telegram_id: number;
 
   @Column()

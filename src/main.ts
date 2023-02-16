@@ -16,7 +16,7 @@ async function bootstrap() {
   );
   const bot = app.get(getBotToken());
   app.use(bot.webhookCallback('/secret-path'));
-  await app.listen(3000);
+  await app.listen(6000);
 }
 
 bootstrap();

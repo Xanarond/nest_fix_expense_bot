@@ -1,9 +1,9 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Categories } from './categories';
-import { TelegramUsers } from './telegram_users';
+import { CategoriesEntity } from './categories.entity';
+import { TelegramUsers } from './telegram_users.entity';
 
-@Entity()
-export class Costs {
+@Entity('costs')
+export class CostsEntity {
   @PrimaryGeneratedColumn('increment')
   cost_id: number;
 
@@ -13,7 +13,7 @@ export class Costs {
   @Column()
   expense_sum: number;
 
-  @ManyToOne(() => Categories, (category) => category.category_id)
+  @ManyToOne(() => CategoriesEntity, (category) => category.category_id)
   expense_id: number;
 
   @ManyToOne(() => TelegramUsers, (users) => users.telegram_id)

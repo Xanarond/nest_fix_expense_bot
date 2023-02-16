@@ -9,10 +9,10 @@ export class Buttons {
           'currency',
         ),
         Markup.button.callback('Учёт расходов', 'expenses'),
-        Markup.button.callback('Ведение бюджета', 'budget'),
+        // Markup.button.callback('Ведение бюджета', 'budget'),
       ],
       {
-        columns: 2,
+        columns: 1,
       },
     );
   }
@@ -48,12 +48,12 @@ export class Buttons {
       [
         Markup.button.callback('Добавление расходов', 'add_expense'),
         Markup.button.callback('Отображение расходов', 'show_expenses'),
-        Markup.button.callback('Редактировать расходы', 'update_expense'),
+        /*Markup.button.callback('Редактировать расходы', 'update_expense'),
         Markup.button.callback('Добавить категорию расходов', 'add_category'),
-        Markup.button.callback('Редактировать категорию', 'update_category'),
+        Markup.button.callback('Редактировать категорию', 'update_category'),*/
       ],
       {
-        columns: 3,
+        columns: 1,
       },
     );
   }

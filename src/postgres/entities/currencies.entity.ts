@@ -1,8 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
-@Entity()
+@Entity('currencies')
 @Unique(['date', 'price'])
-export class Currencies {
+export class CurrenciesEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

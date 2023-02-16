@@ -2,21 +2,21 @@ import { Module } from '@nestjs/common';
 import { PostgresService } from './postgres.service';
 import { CurrenciesModule } from '../currencies/currencies.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Currencies } from './entities/currencies';
-import { TelegramUsers } from './entities/telegram_users';
-import { Categories } from './entities/categories';
-import { Costs } from './entities/costs';
-import { Budgets } from './entities/budgets';
+import { CurrenciesEntity } from './entities/currencies.entity';
+import { TelegramUsers } from './entities/telegram_users.entity';
+import { CategoriesEntity } from './entities/categories.entity';
+import { CostsEntity } from './entities/costs.entity';
+import { BudgetsEntity } from './entities/budgets.entity';
 
 @Module({
   imports: [
     CurrenciesModule,
     TypeOrmModule.forFeature([
-      Currencies,
+      CurrenciesEntity,
       TelegramUsers,
-      Categories,
-      Costs,
-      Budgets,
+      CategoriesEntity,
+      CostsEntity,
+      BudgetsEntity,
     ]),
   ],
   providers: [PostgresService],

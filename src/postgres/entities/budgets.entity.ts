@@ -1,8 +1,8 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { TelegramUsers } from './telegram_users';
+import { TelegramUsers } from './telegram_users.entity';
 
-@Entity()
-export class Budgets {
+@Entity('budgets')
+export class BudgetsEntity {
   @PrimaryGeneratedColumn('increment')
   budget_id: number;
   @Column()

@@ -1,11 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { Command, Ctx, Help, InjectBot, Start, Update } from 'nestjs-telegraf';
+import {
+  Action,
+  Command,
+  Ctx,
+  Hears,
+  Help,
+  InjectBot,
+  Start,
+  Update,
+} from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
 import { Buttons } from './classes/buttons';
 import { PostgresService } from '../postgres/postgres.service';
-import { TelegramUsers } from '../postgres/entities/telegram_users';
+import { TelegramUsers } from '../postgres/entities/telegram_users.entity';
+import { CostsEntity } from '../postgres/entities/costs.entity';
 
-@Injectable()
 @Update()
 export class BotService {
   private _postgres: PostgresService;
@@ -19,6 +27,8 @@ export class BotService {
 
   @Start()
   async start(@Ctx() ctx: Context) {
+    ctx['session']['selected_currency'] = '';
+    ctx['session']['expense_indicator'] = false;
     const telegram_user: TelegramUsers = new TelegramUsers();
     telegram_user.telegram_id = ctx.message.from.id;
     telegram_user.first_name = ctx.message.from.first_name;
@@ -31,10 +41,9 @@ export class BotService {
     await ctx.replyWithHTML(
       `<b>Добро пожаловать ${telegram_user.first_name} ${
         telegram_user.last_name || ''
-      } в бот подсчета расходов</b> \n`,
+      }в бот подсчета расходов</b> \n`,
       Buttons.startupButtons(),
     );
-    // await ctx.reply('bot', Buttons.createButtons());
   }
 
   @Help()
@@ -50,18 +59,4 @@ export class BotService {
   async hey(@Ctx() ctx: Context) {
     await ctx.reply('Добро пожаловать в бот по расчету расходов');
   }
-
-  /*  @Hears('currencies')
-  async hears(@Ctx() ctx: Context) {
-    await ctx.reply('вот курсы');
-  }
-   @On('callback_query')
-  async on(@Ctx() ctx: Context) {
-    await ctx.reply('👍');
-  }*/
-
-  /* @On('text')
-  async getEcho(@Ctx() ctx: Context) {
-    await ctx.reply(`${ctx.message['text']}`);
-  }*/
 }
