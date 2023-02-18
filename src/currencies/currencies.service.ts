@@ -1,33 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { combineLatestAll, map, mergeMap, Observable, of } from 'rxjs';
+import { CRYPTO_CURRENCIES, FIAT_CURRENCIES } from './currencies.constants';
+
+export type Currency = { couple: string; date: string; price: number };
+export type CryptoCurrency = { symbol: string; price: number };
 
 @Injectable()
 export class CurrenciesService {
   constructor(private httpService: HttpService) {}
 
-  getCurrenciesFromFreeAPI(): Observable<
-    { couple: string; date: string; price: number }[]
-  > {
-    const currencies = [
-      'usd/azn',
-      'usd/rub',
-      'usd/eur',
-      'eur/azn',
-      'eur/usd',
-      'eur/rub',
-      'azn/rub',
-      'azn/ils',
-      'azn/usd',
-      'azn/eur',
-      'rub/azn',
-      'rub/usd',
-      'rub/eur',
-    ];
-
+  getCryptoCurrencyBinance(): Observable<CryptoCurrency[]> {
+    const with_rub = this.httpService.get(
+      `https://api.binance.com/api/v3/ticker/price?symbols=${JSON.stringify(
+        CRYPTO_CURRENCIES,
+      )}`,
+    );
+    return with_rub.pipe(
+      map((res) => {
+        return res.data.map((value: CryptoCurrency) => {
+          {
+            return {
+              symbol: value.symbol,
+              price: Number(value.price),
+            };
+          }
+        });
+      }),
+    );
+  }
+  getCurrenciesFromFreeAPI(): Observable<Currency[]> {
     const currencyArr = [];
-    for (const currency in currencies) {
-      const freeAPI = `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${currencies[currency]}.json`;
+    for (const currency in FIAT_CURRENCIES) {
+      const freeAPI = `https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/${FIAT_CURRENCIES[currency]}.json`;
       currencyArr.push(freeAPI);
     }
 
@@ -40,7 +45,7 @@ export class CurrenciesService {
               method: 'GET',
             })
             .pipe(
-              map((res): { couple: string; date: string; price: number } => {
+              map((res): Currency => {
                 return {
                   couple: val.match(/currencies\/(.*?)\./)[1].toUpperCase(),
                   date: res.data.date,

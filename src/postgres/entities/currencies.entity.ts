@@ -15,3 +15,8 @@ export class CurrenciesEntity {
   @Column({ type: 'float' })
   price: number;
 }
+
+export class CryptoCurrenciesEntity {
+  symbol: string;
+  price: number;
+}

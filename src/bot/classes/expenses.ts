@@ -79,7 +79,6 @@ export class Expenses {
           'yyyy-MM-dd',
         );
         costs.expense_sum = Number(split_cost[2]);
-        console.log(costs);
         await this._postgres.insertNewCosts(costs);
         await ctx.reply('Данные добавлены');
       }

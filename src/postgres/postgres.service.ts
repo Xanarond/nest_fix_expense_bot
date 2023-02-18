@@ -1,16 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CurrenciesEntity } from './entities/currencies.entity';
+import {
+  CryptoCurrenciesEntity,
+  CurrenciesEntity,
+} from './entities/currencies.entity';
 import { Repository } from 'typeorm';
-import { CurrenciesService } from '../currencies/currencies.service';
+import {
+  CryptoCurrency,
+  CurrenciesService,
+  Currency,
+} from '../currencies/currencies.service';
 import { DateTime } from 'luxon';
 import { TelegramUsers } from './entities/telegram_users.entity';
 import { CategoriesEntity } from './entities/categories.entity';
 import { generate_categories } from './queries/categories';
 import { CostsEntity } from './entities/costs.entity';
 import { BudgetsEntity } from './entities/budgets.entity';
-
-export type Currency = { couple: string; date: string; price: number };
+import { map, Observable, Subscription, toArray } from 'rxjs';
+import { raw } from 'express';
 
 @Injectable()
 export class PostgresService {
@@ -33,7 +40,7 @@ export class PostgresService {
     this.categoriesRepository.query(generate_categories).then();
   }
 
-  async fetchData(): Promise<CurrenciesEntity[]> {
+  async fetchFiatCurrencyData(): Promise<CurrenciesEntity[]> {
     const current_date = DateTime.local().toFormat('yyyy-MM-dd');
     const previous_date = DateTime.local()
       .minus({ days: 1 })
@@ -69,7 +76,22 @@ export class PostgresService {
     }
   }
 
-  insertNewData() {
+  async fetchCryptoCurrencyData(): Promise<Observable<CryptoCurrency[]>> {
+    return this._currency.getCryptoCurrencyBinance().pipe(
+      map((data) => {
+        const currencies = [];
+        data.map(async (value) => {
+          const crypto_currency = new CryptoCurrenciesEntity();
+          crypto_currency.symbol = value.symbol;
+          crypto_currency.price = value.price;
+          currencies.push(crypto_currency);
+        });
+        return currencies;
+      }),
+    );
+  }
+
+  insertNewData(): Subscription {
     return this._currency
       .getCurrenciesFromFreeAPI()
       .subscribe((data: Currency[]) => {

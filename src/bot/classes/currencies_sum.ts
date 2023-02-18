@@ -1,9 +1,10 @@
 import { Action, Ctx, Hears, InjectBot, Update } from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
 import { PostgresService } from '../../postgres/postgres.service';
-import { CurrenciesEntity } from '../../postgres/entities/currencies.entity';
 import { Buttons } from './buttons';
 import { Injectable } from '@nestjs/common';
+import { CurrenciesEntity } from '../../postgres/entities/currencies.entity';
+
 @Injectable()
 @Update()
 export class CurrenciesSum {
@@ -26,125 +27,81 @@ export class CurrenciesSum {
     await ctx.deleteMessage();
     await ctx.reply('Вот актуальные курсы:');
 
-    const currencies = [];
-    return await this._postgres
-      .fetchData()
-      .then(async (value: CurrenciesEntity[]) => {
-        value.map(async (val: CurrenciesEntity) => {
-          currencies.push(`<b>Пара: ${val.couple} Курс: ${val.price}</b>\n`);
-        });
-        if (currencies.length === 0) {
-          await ctx.reply('Нет информации на данный момент');
-        }
-        if (currencies.length !== 0) {
-          await ctx.replyWithHTML(currencies.join(''));
-        }
-      });
+    const [cryptoData, fiatData] = await Promise.all([
+      (await this._postgres.fetchCryptoCurrencyData()).toPromise(),
+      this._postgres.fetchFiatCurrencyData(),
+    ]);
+
+    const crypts = cryptoData.map(
+      ({ symbol, price }) => `<b>Пара: ${symbol} Курс: ${price}</b>\n`,
+    );
+    const fiat_currencies = fiatData.map(
+      ({ couple, price }) => `<b>Пара: ${couple} Курс: ${price}</b>\n`,
+    );
+
+    const currencies = [...crypts, ...fiat_currencies];
+
+    if (currencies.length === 0) {
+      await ctx.reply('Нет информации на данный момент');
+    }
+
+    if (currencies.length !== 0) {
+      await ctx.replyWithHTML(currencies.join(''));
+    }
   }
 
   @Action('currencies_sum')
   async getCurrenciesSum(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
     await ctx.reply('Введите текущюю валюту:', Buttons.showValuteMenu());
-    // await ctx.sendMessage('');
   }
 
   @Hears(RegExp(`^(\\d+)`))
   async countSum(@Ctx() ctx: Context) {
-    console.log(
-      ctx.message['text'],
-      ctx['session']['expense_indicator'],
-      ctx['session']['selected_currency'],
-    );
-    const currencies_sum = [];
-    if (ctx['session']['selected_currency'] === '') {
-      ctx['session']['selected_currency'] = '';
+    const { message } = ctx;
+    let select_cur = ctx['session']['selected_currency'];
+    if (!select_cur) {
       return;
     }
-    if (ctx['session']['selected_currency'] === 'azn') {
-      ctx['session']['selected_currency'] = '';
-      await this._postgres
-        .fetchData()
-        .then(async (value: CurrenciesEntity[]) => {
-          value.map(async (val: CurrenciesEntity) => {
-            if (val.couple.startsWith('AZN/')) {
-              currencies_sum.push(
-                `<b>Пара: ${val.couple} Курс: ${parseFloat(
-                  String(
-                    parseFloat(String(val.price)) * Number(ctx.message['text']),
-                  ),
-                ).toFixed(3)}</b>\n`,
-              );
-            }
-          });
-        });
-      if (currencies_sum.length === 0)
-        await ctx.reply('Нет информации на данный момент');
-      else await ctx.replyWithHTML(`${currencies_sum.join('')}`);
+
+    const fiatCurrencies = ['azn', 'rub', 'usd', 'eur'];
+
+    if (!fiatCurrencies.includes(select_cur)) {
+      return;
     }
-    if (ctx['session']['selected_currency'] === 'rub') {
-      ctx['session']['selected_currency'] = '';
-      await this._postgres
-        .fetchData()
-        .then(async (value: CurrenciesEntity[]) => {
-          value.map(async (val: CurrenciesEntity) => {
-            if (val.couple.startsWith('RUB/')) {
-              currencies_sum.push(
-                `<b>Пара: ${val.couple} Курс: ${parseFloat(
-                  String(
-                    parseFloat(String(val.price)) * Number(ctx.message['text']),
-                  ),
-                ).toFixed(3)}</b>\n`,
-              );
-            }
-          });
+
+    const [cryptoData] = await Promise.all([
+      (await this._postgres.fetchCryptoCurrencyData()).toPromise(),
+    ]);
+
+    const currencies_sum = await this._postgres.fetchFiatCurrencyData();
+
+    const filtered_currencies = currencies_sum.filter(
+      (currency: CurrenciesEntity) => {
+        return currency.couple.startsWith(`${select_cur.toUpperCase()}/`);
+      },
+    );
+
+    if (filtered_currencies.length === 0) {
+      await ctx.reply('Нет информации на данный момент');
+    } else {
+      const currencies = [];
+      filtered_currencies.map((currency) => {
+        const rate =
+          parseFloat(String(currency.price)) * parseFloat(message['text']);
+        currencies.push(
+          `<b>Пара: ${currency.couple} Курс: ${rate.toFixed(3)}</b>\n`,
+        );
+      });
+      if (ctx['session']['selected_currency'] === 'usd') {
+        cryptoData.map(({ symbol, price }) => {
+          const rate = parseFloat(message['text']) / parseFloat(String(price));
+          currencies.push(`<b>Пара: ${symbol} Курс: ${rate.toFixed(3)}</b>\n`);
         });
-      if (currencies_sum.length === 0)
-        await ctx.reply('Нет информации на данный момент');
-      else await ctx.replyWithHTML(`${currencies_sum.join('')}`);
+      }
+      await ctx.replyWithHTML(currencies.join(''));
     }
-    if (ctx['session']['selected_currency'] === 'usd') {
-      ctx['session']['selected_currency'] = '';
-      await this._postgres
-        .fetchData()
-        .then(async (value: CurrenciesEntity[]) => {
-          value.map(async (val: CurrenciesEntity) => {
-            if (val.couple.startsWith('USD/')) {
-              currencies_sum.push(
-                `<b>Пара: ${val.couple} Курс: ${parseFloat(
-                  String(
-                    parseFloat(String(val.price)) * Number(ctx.message['text']),
-                  ),
-                ).toFixed(3)}</b>\n`,
-              );
-            }
-          });
-        });
-      if (currencies_sum.length === 0)
-        await ctx.reply('Нет информации на данный момент');
-      else await ctx.replyWithHTML(`${currencies_sum.join('')}`);
-    }
-    if (ctx['session']['selected_currency'] === 'eur') {
-      ctx['session']['selected_currency'] = '';
-      await this._postgres
-        .fetchData()
-        .then(async (value: CurrenciesEntity[]) => {
-          value.map(async (val: CurrenciesEntity) => {
-            if (val.couple.startsWith('EUR/')) {
-              currencies_sum.push(
-                `<b>Пара: ${val.couple} Курс: ${parseFloat(
-                  String(
-                    parseFloat(String(val.price)) * Number(ctx.message['text']),
-                  ),
-                ).toFixed(3)}</b>\n`,
-              );
-            }
-          });
-        });
-      if (currencies_sum.length === 0)
-        await ctx.reply('Нет информации на данный момент');
-      else await ctx.replyWithHTML(`${currencies_sum.join('')}`);
-    }
+    select_cur = '';
   }
 
   @Action('azn')
