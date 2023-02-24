@@ -16,8 +16,13 @@ import { CategoriesEntity } from './entities/categories.entity';
 import { generate_categories } from './queries/categories';
 import { CostsEntity } from './entities/costs.entity';
 import { BudgetsEntity } from './entities/budgets.entity';
-import { map, Observable, Subscription, toArray } from 'rxjs';
-import { raw } from 'express';
+import { map, Observable, Subscription } from 'rxjs';
+import { FIAT_CURRENCIES } from '../currencies/currencies.constants';
+
+export type Budget = {
+  currency: string;
+  count: number;
+};
 
 @Injectable()
 export class PostgresService {
@@ -51,8 +56,8 @@ export class PostgresService {
       },
     });
 
-    if (expression !== 13) {
-      this.insertNewData();
+    if (expression !== FIAT_CURRENCIES.length) {
+      this.insertFiatCurrencies();
 
       return this.currenciesRepository
         .createQueryBuilder('currency')
@@ -91,7 +96,7 @@ export class PostgresService {
     );
   }
 
-  insertNewData(): Subscription {
+  insertFiatCurrencies(): Subscription {
     return this._currency
       .getCurrenciesFromFreeAPI()
       .subscribe((data: Currency[]) => {
@@ -110,7 +115,6 @@ export class PostgresService {
   }
 
   async getExpenses(id: number) {
-    console.log(id);
     return await this.costsRepository.query(
       `SELECT to_char(date, 'DD-MM-YYYY') as date, EXPENSE_SUM,
         CATEGORIES.CATEGORY
@@ -126,5 +130,19 @@ WHERE COSTS."telegramUserIdTelegramId" = ${id}`,
 
   async showCategories() {
     return await this.categoriesRepository.find();
+  }
+
+  async insertBudgetSum(budget: BudgetsEntity) {
+    await this.budgetRepository.upsert(budget, ['currency']);
+  }
+
+  async showBudgetSum(id: number): Promise<Budget[]> {
+    return await this.budgetRepository
+      .createQueryBuilder('budget')
+      .select(['currency', 'count'])
+      .where('budget.belongTelegramId = :telegram_id', {
+        telegram_id: id,
+      })
+      .getRawMany();
   }
 }

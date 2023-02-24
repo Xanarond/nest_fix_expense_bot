@@ -3,8 +3,9 @@ import { BotService } from './bot.service';
 import * as LocalSession from 'telegraf-session-local';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { PostgresModule } from '../postgres/postgres.module';
-import { CurrenciesSum } from './classes/currencies_sum';
-import { Expenses } from './classes/expenses';
+import { CurrenciesSum } from './scenes/currencies_sum.scene';
+import { ExpensesScene } from './scenes/expenses.scene';
+import { BudgetScene } from './scenes/budget.scene';
 
 const sessions = new LocalSession({ database: 'session.json' });
 
@@ -18,6 +19,6 @@ const sessions = new LocalSession({ database: 'session.json' });
     }),
     PostgresModule,
   ],
-  providers: [BotService, Expenses, CurrenciesSum],
+  providers: [BotService, ExpensesScene, CurrenciesSum, BudgetScene],
 })
 export class BotModule {}

@@ -1,12 +1,10 @@
-import { Action, Ctx, Hears, InjectBot, Update } from 'nestjs-telegraf';
+import { Action, Ctx, Hears, InjectBot, Scene } from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
 import { PostgresService } from '../../postgres/postgres.service';
-import { Buttons } from './buttons';
-import { Injectable } from '@nestjs/common';
+import { BotButtons } from '../bot.buttons';
 import { CurrenciesEntity } from '../../postgres/entities/currencies.entity';
 
-@Injectable()
-@Update()
+@Scene('currencies_sum')
 export class CurrenciesSum {
   private _postgres: PostgresService;
 
@@ -15,11 +13,6 @@ export class CurrenciesSum {
     postgres: PostgresService,
   ) {
     this._postgres = postgres;
-  }
-  @Hears('Получение или расчет суммы курсов валют')
-  async getCommand(@Ctx() ctx: Context) {
-    await ctx.deleteMessage();
-    await ctx.reply('Вот основные команды:', Buttons.showCommandsMenu());
   }
 
   @Action('currencies')
@@ -43,23 +36,25 @@ export class CurrenciesSum {
 
     if (currencies.length === 0) {
       await ctx.reply('Нет информации на данный момент');
+      await ctx['scene'].leave();
     }
 
     if (currencies.length !== 0) {
       await ctx.replyWithHTML(currencies.join(''));
+      await ctx['scene'].leave();
     }
   }
 
   @Action('currencies_sum')
   async getCurrenciesSum(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
-    await ctx.reply('Введите текущюю валюту:', Buttons.showValuteMenu());
+    await ctx.reply('Введите текущюю валюту:', BotButtons.showValuteMenu());
   }
 
   @Hears(RegExp(`^(\\d+)`))
   async countSum(@Ctx() ctx: Context) {
     const { message } = ctx;
-    let select_cur = ctx['session']['selected_currency'];
+    const select_cur = ctx['session']['selected_currency'];
     if (!select_cur) {
       return;
     }
@@ -101,7 +96,8 @@ export class CurrenciesSum {
       }
       await ctx.replyWithHTML(currencies.join(''));
     }
-    select_cur = '';
+    ctx['session']['selected_currency'] = '';
+    await ctx['scene'].leave();
   }
 
   @Action('azn')

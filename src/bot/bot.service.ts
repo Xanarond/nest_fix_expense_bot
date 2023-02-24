@@ -1,5 +1,4 @@
 import {
-  Action,
   Command,
   Ctx,
   Hears,
@@ -9,10 +8,9 @@ import {
   Update,
 } from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
-import { Buttons } from './classes/buttons';
+import { BotButtons } from './bot.buttons';
 import { PostgresService } from '../postgres/postgres.service';
 import { TelegramUsers } from '../postgres/entities/telegram_users.entity';
-import { CostsEntity } from '../postgres/entities/costs.entity';
 
 @Update()
 export class BotService {
@@ -41,8 +39,8 @@ export class BotService {
     await ctx.replyWithHTML(
       `<b>Добро пожаловать ${telegram_user.first_name} ${
         telegram_user.last_name || ''
-      }в бот подсчета расходов</b> \n`,
-      Buttons.startupButtons(),
+      } в бот подсчета расходов</b>\n`,
+      BotButtons.startupButtons(),
     );
   }
 
@@ -58,5 +56,26 @@ export class BotService {
   @Command('hello')
   async hey(@Ctx() ctx: Context) {
     await ctx.reply('Добро пожаловать в бот по расчету расходов');
+  }
+
+  @Hears('Получение или расчет суммы курсов валют')
+  async getCommand(@Ctx() ctx: Context) {
+    await ctx.deleteMessage();
+    await ctx['scene'].enter('currencies_sum');
+    await ctx.reply('Вот основные команды:', BotButtons.showCommandsMenu());
+  }
+
+  @Hears('Учёт расходов')
+  async getCostsCommands(@Ctx() ctx: Context) {
+    await ctx.deleteMessage();
+    await ctx['scene'].enter('expenses');
+    await ctx.reply('Вот основные команды:', BotButtons.showExpensesMenu());
+  }
+
+  @Hears('Ведение бюджета')
+  async getCommands(@Ctx() ctx: Context) {
+    await ctx.deleteMessage();
+    await ctx['scene'].enter('budget');
+    await ctx.reply('Вот основные команды', BotButtons.showBudgetOptions());
   }
 }

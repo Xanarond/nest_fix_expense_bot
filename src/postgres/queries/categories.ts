@@ -4,4 +4,5 @@ export const generate_categories = `INSERT INTO PUBLIC.CATEGORIES(CATEGORY) VALU
 ('Клининг'),
 ('Расходники'),
 ('Стирка'),
-('Вода') ON CONFLICT (CATEGORY) DO NOTHING`;
+('Вода'), 
+('Сотовая связь') ON CONFLICT (CATEGORY) DO NOTHING`;
