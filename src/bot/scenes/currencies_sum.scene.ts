@@ -59,7 +59,7 @@ export class CurrenciesSum {
       return;
     }
 
-    const fiatCurrencies = ['azn', 'rub', 'usd', 'eur'];
+    const fiatCurrencies = ['azn', 'rub', 'usd', 'eur', 'ils', 'aed'];
 
     if (!fiatCurrencies.includes(select_cur)) {
       return;
@@ -96,8 +96,6 @@ export class CurrenciesSum {
       }
       await ctx.replyWithHTML(currencies.join(''));
     }
-    ctx['session']['selected_currency'] = '';
-    await ctx['scene'].leave();
   }
 
   @Action('azn')
@@ -129,6 +127,22 @@ export class CurrenciesSum {
     ctx['session']['selected_currency'] = '';
     await ctx.deleteMessage();
     await ctx.reply('Введите сумму EUR:');
+    ctx['session']['selected_currency'] = ctx.callbackQuery['data'];
+  }
+
+  @Action('ils')
+  async getIls(@Ctx() ctx: Context) {
+    ctx['session']['selected_currency'] = '';
+    await ctx.deleteMessage();
+    await ctx.reply('Введите сумму ILS:');
+    ctx['session']['selected_currency'] = ctx.callbackQuery['data'];
+  }
+
+  @Action('aed')
+  async getAed(@Ctx() ctx: Context) {
+    ctx['session']['selected_currency'] = '';
+    await ctx.deleteMessage();
+    await ctx.reply('Введите сумму AED:');
     ctx['session']['selected_currency'] = ctx.callbackQuery['data'];
   }
 }

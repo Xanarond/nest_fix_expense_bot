@@ -2,6 +2,7 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
@@ -17,6 +18,6 @@ export class BudgetsEntity {
   @Column({ type: 'float' })
   count: number;
 
-  @ManyToOne(() => TelegramUsers, (users) => users.telegram_id)
+  @ManyToOne(() => TelegramUsers, (users: TelegramUsers) => users.telegram_id)
   belong: number;
 }

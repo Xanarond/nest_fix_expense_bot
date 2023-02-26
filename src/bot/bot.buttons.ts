@@ -4,12 +4,12 @@ export class BotButtons {
   static startupButtons() {
     return Markup.keyboard(
       [
+        Markup.button.callback('Ведение бюджета', 'budget'),
         Markup.button.callback(
           'Получение или расчет суммы курсов валют',
           'currency',
         ),
         Markup.button.callback('Учёт расходов', 'expenses'),
-        Markup.button.callback('Ведение бюджета', 'budget'),
       ],
       {
         columns: 1,
@@ -21,7 +21,7 @@ export class BotButtons {
     return Markup.inlineKeyboard(
       [
         Markup.button.callback('Курсы Валют', 'currencies'),
-        Markup.button.callback('Расчет курс для суммы', 'currencies_sum'),
+        Markup.button.callback('Расчет курса для суммы', 'currencies_sum'),
       ],
       {
         columns: 2,
@@ -32,13 +32,15 @@ export class BotButtons {
   static showValuteMenu() {
     return Markup.inlineKeyboard(
       [
-        Markup.button.callback('Манат', 'azn'),
-        Markup.button.callback('Рубль', 'rub'),
-        Markup.button.callback('Доллар', 'usd'),
-        Markup.button.callback('Евро', 'eur'),
+        Markup.button.callback('AZN', 'azn'),
+        Markup.button.callback('RUB', 'rub'),
+        Markup.button.callback('USD', 'usd'),
+        Markup.button.callback('EUR', 'eur'),
+        Markup.button.callback('ILS', 'ils'),
+        Markup.button.callback('AED', 'aed'),
       ],
       {
-        columns: 2,
+        columns: 3,
       },
     );
   }

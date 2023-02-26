@@ -1,7 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { CategoriesEntity } from './categories.entity';
 import { TelegramUsers } from './telegram_users.entity';
-import { BudgetsEntity } from './budgets.entity';
 
 @Entity('costs')
 export class CostsEntity {
@@ -14,7 +13,7 @@ export class CostsEntity {
   @Column()
   expense_sum: number;
 
-  @ManyToOne(() => BudgetsEntity, (budget: BudgetsEntity) => budget.currency)
+  @Column()
   currency: string;
 
   @ManyToOne(
