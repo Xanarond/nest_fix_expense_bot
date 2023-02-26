@@ -24,9 +24,16 @@ export type Budget = {
   count: number;
 };
 
+export type Expenses = {
+  date: string;
+  expense_sum: number;
+  category: string;
+  currency: string;
+};
+
 @Injectable()
 export class PostgresService {
-  private _currency: CurrenciesService;
+  private currenciesService: CurrenciesService;
 
   constructor(
     @InjectRepository(CurrenciesEntity)
@@ -41,7 +48,7 @@ export class PostgresService {
     private readonly costsRepository: Repository<CostsEntity>,
     currency: CurrenciesService,
   ) {
-    this._currency = currency;
+    this.currenciesService = currency;
     this.categoriesRepository.query(generate_categories).then();
   }
 
@@ -82,10 +89,10 @@ export class PostgresService {
   }
 
   async fetchCryptoCurrencyData(): Promise<Observable<CryptoCurrency[]>> {
-    return this._currency.getCryptoCurrencyBinance().pipe(
-      map((data) => {
+    return this.currenciesService.getCryptoCurrencyBinance().pipe(
+      map((data: CryptoCurrency[]) => {
         const currencies = [];
-        data.map(async (value) => {
+        data.map(async (value: CryptoCurrency) => {
           const crypto_currency = new CryptoCurrenciesEntity();
           crypto_currency.symbol = value.symbol;
           crypto_currency.price = value.price;
@@ -97,7 +104,7 @@ export class PostgresService {
   }
 
   insertFiatCurrencies(): Subscription {
-    return this._currency
+    return this.currenciesService
       .getCurrenciesFromFreeAPI()
       .subscribe((data: Currency[]) => {
         data.map(async (value: Currency) => {
@@ -114,10 +121,11 @@ export class PostgresService {
     return this.telegramUserRepository.upsert(telegram_user, ['telegram_id']);
   }
 
-  async getExpenses(id: number) {
+  async getExpenses(id: number): Promise<Expenses[]> {
     return await this.costsRepository.query(
       `SELECT to_char(date, 'DD-MM-YYYY') as date, EXPENSE_SUM,
-        CATEGORIES.CATEGORY
+        CATEGORIES.CATEGORY, 
+        CURRENCY
         FROM public.COSTS
 LEFT JOIN PUBLIC.CATEGORIES ON CATEGORIES.CATEGORY_ID = COSTS."expenseIdCategoryId"
 WHERE COSTS."telegramUserIdTelegramId" = ${id}`,
@@ -128,7 +136,7 @@ WHERE COSTS."telegramUserIdTelegramId" = ${id}`,
     return this.costsRepository.insert(costs);
   }
 
-  async showCategories() {
+  async showCategories(): Promise<CategoriesEntity[]> {
     return await this.categoriesRepository.find();
   }
 

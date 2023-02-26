@@ -11,7 +11,7 @@ import { CostsEntity } from './costs.entity';
 @Unique(['category'])
 export class CategoriesEntity {
   @PrimaryGeneratedColumn('increment')
-  @OneToMany(() => CostsEntity, (costs) => costs.cost_id)
+  @OneToMany(() => CostsEntity, (costs: CostsEntity) => costs.cost_id)
   category_id: number;
 
   @Column()

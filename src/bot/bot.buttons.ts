@@ -5,11 +5,11 @@ export class BotButtons {
     return Markup.keyboard(
       [
         Markup.button.callback('Ведение бюджета', 'budget'),
+        Markup.button.callback('Учёт расходов', 'expenses'),
         Markup.button.callback(
           'Получение или расчет суммы курсов валют',
           'currency',
         ),
-        Markup.button.callback('Учёт расходов', 'expenses'),
       ],
       {
         columns: 1,

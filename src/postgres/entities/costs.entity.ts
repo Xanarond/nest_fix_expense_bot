@@ -10,7 +10,7 @@ export class CostsEntity {
   @Column({ type: 'date' })
   date: string;
 
-  @Column()
+  @Column({ type: 'float' })
   expense_sum: number;
 
   @Column()

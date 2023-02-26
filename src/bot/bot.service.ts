@@ -49,15 +49,17 @@ export class BotService {
     await ctx.replyWithHTML(
       '<b>Добро пожаловать в справку бота подсчета расходов</b> \n' +
         '1. <i>/commands</i> Получение списка команд бота \n' +
-        '2. ..... \n' +
-        '3. ..... \n',
+        'Все пожелания и вопросы: @xanarond',
     );
   }
-  @Command('hello')
-  async hey(@Ctx() ctx: Context) {
-    await ctx.reply('Добро пожаловать в бот по расчету расходов');
-  }
 
+  @Command('commands')
+  async getBotCommands(@Ctx() ctx: Context) {
+    await ctx.replyWithHTML(
+      `<b>Вот остновной список команд</b>\n`,
+      BotButtons.startupButtons(),
+    );
+  }
   @Hears('Получение или расчет суммы курсов валют')
   async getCommand(@Ctx() ctx: Context) {
     await ctx.deleteMessage();

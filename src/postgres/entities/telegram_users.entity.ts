@@ -5,7 +5,7 @@ import { CostsEntity } from './costs.entity';
 @Unique(['telegram_id'])
 export class TelegramUsers {
   @PrimaryColumn({ type: 'bigint' })
-  @OneToMany(() => CostsEntity, (costs) => costs.telegram_user_id)
+  @OneToMany(() => CostsEntity, (costs: CostsEntity) => costs.telegram_user_id)
   telegram_id: number;
 
   @Column()

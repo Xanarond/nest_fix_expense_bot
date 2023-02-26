@@ -16,27 +16,21 @@ export class BudgetScene {
   }
   @Hears(RegExp(`^(\\d+(\\.\\d{1,2})?) ([A-Z]{3,4})$`))
   async insertBudget(@Ctx() ctx: Context) {
-    if (!ctx['session']['budget_currency']) {
-      return;
-    } else {
-      ctx['session']['budget_currency'] = false;
-      const budget = new BudgetsEntity();
-      budget.count = ctx.message['text'].split(' ')[0];
-      budget.currency = ctx.message['text'].split(' ')[1];
-      budget.belong = ctx.message.from.id;
-      await this._postgres.insertBudgetSum(budget);
-      await ctx.reply('Данные введены');
-      await ctx['scene'].leave();
-    }
+    const budget = new BudgetsEntity();
+    budget.count = ctx.message['text'].split(' ')[0];
+    budget.currency = ctx.message['text'].split(' ')[1];
+    budget.belong = ctx.message.from.id;
+    await this._postgres.insertBudgetSum(budget);
+    await ctx.reply('Данные добавлены');
+    await ctx['scene'].leave();
   }
 
   @Action('add_budget_sum')
   async getBudget(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
-    await ctx.reply(`Введите данные такого формата\n
+    await ctx.reply(`Введите данные такого формата
     200.50 USD или 200 USD
     `);
-    ctx['session']['budget_currency'] = true;
   }
 
   @Action('show_budget')
