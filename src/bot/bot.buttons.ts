@@ -29,7 +29,7 @@ export class BotButtons {
     );
   }
 
-  static showValuteMenu() {
+  static showCurrencyMenu() {
     return Markup.inlineKeyboard(
       [
         Markup.button.callback('AZN', 'azn'),
@@ -38,6 +38,9 @@ export class BotButtons {
         Markup.button.callback('EUR', 'eur'),
         Markup.button.callback('ILS', 'ils'),
         Markup.button.callback('AED', 'aed'),
+        Markup.button.callback('TRY', 'try'),
+        Markup.button.callback('GEL', 'gel'),
+        Markup.button.callback('AMD', 'amd'),
       ],
       {
         columns: 3,
@@ -65,6 +68,23 @@ export class BotButtons {
       [
         Markup.button.callback('Добавление данных о бюджете', 'add_budget_sum'),
         Markup.button.callback('Отображение бюджета', 'show_budget'),
+      ],
+      {
+        columns: 1,
+      },
+    );
+  }
+  static showCurrenciesOptions() {
+    return Markup.inlineKeyboard(
+      [
+        Markup.button.callback(
+          'Получить данные котировок по всем парам',
+          'all_currencies',
+        ),
+        Markup.button.callback(
+          'Получить данные только по текущей валюте',
+          'main_currency',
+        ),
       ],
       {
         columns: 1,

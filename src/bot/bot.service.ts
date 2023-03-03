@@ -33,6 +33,7 @@ export class BotService {
     telegram_user.username = ctx.message.from.username;
     telegram_user.last_name = ctx.message.from.last_name || null;
     telegram_user.is_premium = ctx.message.from.is_premium || false;
+    telegram_user.language = ctx.message.from.language_code;
 
     await this._postgres.loginTelegramBot(telegram_user);
 
@@ -56,28 +57,32 @@ export class BotService {
   @Command('commands')
   async getBotCommands(@Ctx() ctx: Context) {
     await ctx.replyWithHTML(
-      `<b>Вот остновной список команд</b>\n`,
+      `<b>Вот остновной список команд:</b>\n`,
       BotButtons.startupButtons(),
     );
   }
   @Hears('Получение или расчет суммы курсов валют')
   async getCommand(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
-    await ctx['scene'].enter('currencies_sum');
-    await ctx.reply('Вот основные команды:', BotButtons.showCommandsMenu());
+    await ctx['scene'].enter('def_currency');
+    await ctx.reply(
+      '💳 Выберите основную валюту для дальнейшего расчета:',
+      BotButtons.showCurrencyMenu(),
+    );
+    console.log(ctx);
   }
 
   @Hears('Учёт расходов')
   async getCostsCommands(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
     await ctx['scene'].enter('expenses');
-    await ctx.reply('Вот основные команды:', BotButtons.showExpensesMenu());
+    await ctx.reply('☟ Вот основные команды:', BotButtons.showExpensesMenu());
   }
 
   @Hears('Ведение бюджета')
   async getCommands(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
     await ctx['scene'].enter('budget');
-    await ctx.reply('Вот основные команды', BotButtons.showBudgetOptions());
+    await ctx.reply('☟ Вот основные команды', BotButtons.showBudgetOptions());
   }
 }

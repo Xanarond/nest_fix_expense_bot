@@ -6,6 +6,7 @@ import { PostgresModule } from '../postgres/postgres.module';
 import { CurrenciesSum } from './scenes/currencies_sum.scene';
 import { ExpensesScene } from './scenes/expenses.scene';
 import { BudgetScene } from './scenes/budget.scene';
+import { DefaultCurrency } from './scenes/default_currency';
 
 const sessions = new LocalSession({ database: 'session.json' });
 
@@ -19,6 +20,12 @@ const sessions = new LocalSession({ database: 'session.json' });
     }),
     PostgresModule,
   ],
-  providers: [BotService, ExpensesScene, CurrenciesSum, BudgetScene],
+  providers: [
+    BotService,
+    ExpensesScene,
+    CurrenciesSum,
+    BudgetScene,
+    DefaultCurrency,
+  ],
 })
 export class BotModule {}

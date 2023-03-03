@@ -14,7 +14,7 @@ export class BudgetScene {
     this.bot = bot;
     this._postgres = postgres;
   }
-  @Hears(RegExp(`^(\\d+(\\.\\d{1,2})?) ([A-Z]{3,4})$`))
+  @Hears(RegExp(`^(\\d+(\\.\\d{1,3})?) ([A-Z]{3,4})$`))
   async insertBudget(@Ctx() ctx: Context) {
     const budget = new BudgetsEntity();
     budget.count = ctx.message['text'].split(' ')[0];
@@ -28,8 +28,10 @@ export class BudgetScene {
   @Action('add_budget_sum')
   async getBudget(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
-    await ctx.reply(`Введите данные такого формата
-    200.50 USD или 200 USD
+    await ctx.reply(`Введите данные такого формата 
+    100.50 VAL или 1 VAL где сумма может быть как целым так и дробным числом, а VAL - валюта.
+    Пример валют: USD, EUR, ILS, BTC, ETH, USDT и т.д.
+    Пример вводимых данных: 100.50 USD или 100 EUR
     `);
   }
 

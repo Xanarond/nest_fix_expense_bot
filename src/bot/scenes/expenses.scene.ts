@@ -91,7 +91,10 @@ export class ExpensesScene {
       budget_filter.map(async (el: Budget) => {
         if (el.count >= expense_sum) {
           this._budget.belong = telegram_id;
-          this._budget.count = el.count - expense_sum;
+          const diff =
+            parseFloat(String(el.count)) - parseFloat(String(expense_sum));
+
+          this._budget.count = diff.toFixed(3);
           this._budget.currency = currency;
           await this._postgres.insertBudgetSum(this._budget);
 

@@ -15,7 +15,7 @@ export class BudgetsEntity {
   @Column()
   currency: string;
   @Column({ type: 'float' })
-  count: number;
+  count: string;
 
   @ManyToOne(() => TelegramUsers, (users: TelegramUsers) => users.telegram_id)
   belong: number;

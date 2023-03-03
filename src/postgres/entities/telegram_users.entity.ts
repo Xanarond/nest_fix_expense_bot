@@ -18,5 +18,8 @@ export class TelegramUsers {
   username: string;
 
   @Column()
+  language: string;
+
+  @Column()
   is_premium: boolean;
 }

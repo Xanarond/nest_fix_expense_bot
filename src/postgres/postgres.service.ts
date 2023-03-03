@@ -16,7 +16,7 @@ import { CategoriesEntity } from './entities/categories.entity';
 import { generate_categories } from './queries/categories';
 import { CostsEntity } from './entities/costs.entity';
 import { BudgetsEntity } from './entities/budgets.entity';
-import { map, Observable, Subscription } from 'rxjs';
+import { lastValueFrom, map, Subscription } from 'rxjs';
 import { FIAT_CURRENCIES } from '../currencies/currencies.constants';
 
 export type Budget = {
@@ -52,55 +52,45 @@ export class PostgresService {
     this.categoriesRepository.query(generate_categories).then();
   }
 
-  async fetchFiatCurrencyData(): Promise<CurrenciesEntity[]> {
+  async fetchFiatCurrencyData(currency?: string): Promise<CurrenciesEntity[]> {
     const current_date = DateTime.local().toFormat('yyyy-MM-dd');
     const previous_date = DateTime.local()
       .minus({ days: 1 })
       .toFormat('yyyy-MM-dd');
     const expression = await this.currenciesRepository.count({
-      where: {
-        date: current_date,
-      },
+      where: { date: current_date },
     });
-
     if (expression !== FIAT_CURRENCIES.length) {
       this.insertFiatCurrencies();
-
-      return this.currenciesRepository
-        .createQueryBuilder('currency')
-        .distinctOn(['couple'])
-        .select(['id', 'couple', 'date', 'price'])
-        .where('currency.date between :date1 and :date2', {
-          date1: previous_date,
-          date2: current_date,
-        })
-        .getRawMany();
-    } else {
-      return this.currenciesRepository
-        .createQueryBuilder('currency')
-        .distinctOn(['couple'])
-        .select(['id', 'couple', 'date', 'price'])
-        .where('currency.date between :date1 and :date2', {
-          date1: previous_date,
-          date2: current_date,
-        })
-        .getRawMany();
     }
+    const queryBuilder = this.currenciesRepository
+      .createQueryBuilder('currency')
+      .distinctOn(['couple'])
+      .select(['couple', 'price'])
+      .where('currency.date between :date1 and :date2', {
+        date1: previous_date,
+        date2: current_date,
+      });
+    if (currency) {
+      queryBuilder.andWhere('currency.couple like :couple', {
+        couple: `${currency}/%`,
+      });
+    }
+    return await queryBuilder.getRawMany();
   }
 
-  async fetchCryptoCurrencyData(): Promise<Observable<CryptoCurrency[]>> {
-    return this.currenciesService.getCryptoCurrencyBinance().pipe(
-      map((data: CryptoCurrency[]) => {
-        const currencies = [];
-        data.map(async (value: CryptoCurrency) => {
-          const crypto_currency = new CryptoCurrenciesEntity();
-          crypto_currency.symbol = value.symbol;
-          crypto_currency.price = value.price;
-          currencies.push(crypto_currency);
-        });
-        return currencies;
-      }),
-    );
+  async fetchCryptoCurrencyData(): Promise<CryptoCurrency[]> {
+    const cryptoCurrencies = [];
+    const data = this.currenciesService.getCryptoCurrencyBinance();
+    const currencies = [];
+    (await lastValueFrom(data)).map(async (value: CryptoCurrency) => {
+      const crypto_currency = new CryptoCurrenciesEntity();
+      crypto_currency.symbol = value.symbol;
+      crypto_currency.price = value.price;
+      currencies.push(crypto_currency);
+    });
+    cryptoCurrencies.push(...currencies);
+    return cryptoCurrencies;
   }
 
   insertFiatCurrencies(): Subscription {
