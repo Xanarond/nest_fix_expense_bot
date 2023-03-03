@@ -57,12 +57,26 @@ export class CurrenciesSum {
     const main_currencies = [...crypts, ...fiat_currencies];
     if (main_currencies.length === 0) {
       await ctx.reply('Нет информации на данный момент');
+      await ctx.reply(
+        'Вы можете ☟',
+        Markup.inlineKeyboard([
+          Markup.button.callback(
+            '◀ Вернутся к выбору валюты',
+            'another_currency',
+          ),
+          Markup.button.callback('▲ Перейти назад', 'currencies'),
+        ]),
+      );
     } else {
       await ctx.replyWithHTML(main_currencies.join(''));
       await ctx.reply(
-        '',
+        'Вы можете ☟',
         Markup.inlineKeyboard([
-          Markup.button.callback('◀ Выбрать другую валюту', 'another_currency'),
+          Markup.button.callback(
+            '◀ Вернутся к выбору валюты',
+            'another_currency',
+          ),
+          Markup.button.callback('▲ Перейти назад', 'currencies'),
         ]),
       );
     }
@@ -96,6 +110,8 @@ export class CurrenciesSum {
             '◀ Вернутся к выбору валюты',
             'another_currency',
           ),
+          Markup.button.callback('▲ Перейти назад', 'currencies'),
+          Markup.button.callback('▲ Выйти из раздела', 'close_count'),
         ]),
       );
     }
@@ -109,6 +125,8 @@ export class CurrenciesSum {
             '◀ Вернутся к выбору валюты',
             'another_currency',
           ),
+          Markup.button.callback('▲ Перейти назад', 'currencies'),
+          Markup.button.callback('▲ Выйти из раздела', 'close_count'),
         ]),
       );
     }

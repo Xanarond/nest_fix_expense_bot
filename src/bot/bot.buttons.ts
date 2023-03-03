@@ -22,6 +22,7 @@ export class BotButtons {
       [
         Markup.button.callback('Курсы Валют', 'currencies'),
         Markup.button.callback('Расчет курса для суммы', 'currencies_sum'),
+        Markup.button.callback('▲ Выйти из раздела', 'close_count'),
       ],
       {
         columns: 2,
@@ -85,6 +86,7 @@ export class BotButtons {
           'Получить данные только по текущей валюте',
           'main_currency',
         ),
+        Markup.button.callback('▲ Выйти из раздела', 'close_count'),
       ],
       {
         columns: 1,
