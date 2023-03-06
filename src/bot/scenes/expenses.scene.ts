@@ -1,27 +1,31 @@
 import { Action, Ctx, Hears, InjectBot, Scene } from 'nestjs-telegraf';
 import {
   Budget,
+  Categories,
   Expenses,
   PostgresService,
 } from '../../postgres/postgres.service';
 import { Context, Telegraf } from 'telegraf';
 import { CostsEntity } from '../../postgres/entities/costs.entity';
 import { DateTime } from 'luxon';
-import { CategoriesEntity } from '../../postgres/entities/categories.entity';
 import { BudgetsEntity } from '../../postgres/entities/budgets.entity';
+import { I18nTranslateService } from '../../i18n/i18n.service';
 @Scene('expenses')
 export class ExpensesScene {
   private _postgres: PostgresService;
   private readonly _budget: BudgetsEntity;
   private readonly _costs: CostsEntity;
+  private readonly _i18n: I18nTranslateService;
 
   constructor(
     @InjectBot() private bot: Telegraf<Context>,
     postgres: PostgresService,
+    i18n: I18nTranslateService,
   ) {
     this._budget = new BudgetsEntity();
     this._costs = new CostsEntity();
     this._postgres = postgres;
+    this._i18n = i18n;
   }
 
   @Action('show_expenses')
@@ -40,9 +44,13 @@ export class ExpensesScene {
           );
         });
         if (resp.length === 0) {
-          return ctx.reply('Поздравляю, у тебя нет пока еще расходов');
+          return ctx.reply(
+            await this._i18n.getExpensesNo(ctx['session']['language']),
+          );
         } else {
-          await ctx.reply('Вот данные по твоим расходам:');
+          await ctx.reply(
+            await this._i18n.getExpensesInfo(ctx['session']['language']),
+          );
           return await ctx.replyWithHTML(resp.join(''));
         }
       });
@@ -53,14 +61,22 @@ export class ExpensesScene {
     await ctx.deleteMessage();
     ctx['session']['expense_indicator'] = true;
     const categories = [];
-    await this._postgres.showCategories().then((value: CategoriesEntity[]) => {
-      value.map((el: CategoriesEntity) =>
-        categories.push(`<b>${el.category_id}. ${el.category}</b>\n`),
-      );
-    });
-    await ctx.reply('Вот список доступных категорий:');
-    await ctx.replyWithHTML(`${categories.join('')}
-    Введите данные в формате: 1 01-01-2023 200 USD`);
+    await this._postgres
+      .showCategories(ctx['session']['language'])
+      .then((value: Categories[]) => {
+        value.map((el: Categories) =>
+          categories.push(`<b>${el.category_id}. ${el.category}</b>\n`),
+        );
+      });
+    await ctx.reply(
+      await this._i18n.getExpensesCategories(ctx['session']['language']),
+    );
+    await ctx.replyWithHTML(
+      await this._i18n.getExpensesFormat(
+        ctx['session']['language'],
+        categories.join(''),
+      ),
+    );
   }
 
   @Hears(
@@ -83,7 +99,10 @@ export class ExpensesScene {
       });
     if (budget_filter.length === 0) {
       await ctx.reply(
-        `Нет данных по этой валюте у тебя в бюджете. Поэтому расходы в ${currency} не внести!`,
+        await this._i18n.getExpensesNoData(
+          ctx['session']['language'],
+          currency,
+        ),
       );
     }
 
@@ -108,9 +127,13 @@ export class ExpensesScene {
           this._costs.currency = currency;
           await this._postgres.insertNewCosts(this._costs);
 
-          await ctx.reply('Данные добавлены');
+          await ctx.reply(
+            await this._i18n.getAddedData(ctx['session']['language']),
+          );
         } else {
-          await ctx.reply('Расходы больше суммы твоего бюджета!');
+          await ctx.reply(
+            await this._i18n.getExpensesImpossible(ctx['session']['language']),
+          );
         }
       });
     }

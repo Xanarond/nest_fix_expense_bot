@@ -7,6 +7,7 @@ import { CurrenciesSum } from './scenes/currencies_sum.scene';
 import { ExpensesScene } from './scenes/expenses.scene';
 import { BudgetScene } from './scenes/budget.scene';
 import { DefaultCurrency } from './scenes/default_currency';
+import { I18nTranslateModule } from '../i18n/i18n.module';
 
 const sessions = new LocalSession({ database: 'session.json' });
 
@@ -19,6 +20,7 @@ const sessions = new LocalSession({ database: 'session.json' });
       }),
     }),
     PostgresModule,
+    I18nTranslateModule,
   ],
   providers: [
     BotService,

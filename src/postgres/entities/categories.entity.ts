@@ -8,12 +8,14 @@ import {
 import { CostsEntity } from './costs.entity';
 
 @Entity('categories')
-@Unique(['category'])
 export class CategoriesEntity {
   @PrimaryGeneratedColumn('increment')
   @OneToMany(() => CostsEntity, (costs: CostsEntity) => costs.cost_id)
   category_id: number;
 
-  @Column()
+  @Column({ unique: true })
   category: string;
+
+  @Column({ unique: true })
+  category_en: string;
 }

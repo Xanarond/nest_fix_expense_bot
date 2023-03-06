@@ -1,0 +1,30 @@
+{
+  "main_keyboard": {
+    "BUDGET": "Budget management",
+    "EXPENSES": "Expense accounting",
+    "CURRENCIES_SUM": "Receiving or calculating the amount of exchange rates"
+  },
+  "currencies": {
+    "EXCHANGE": "Exchange Rates",
+    "EXCHANGE_SUM": "Calculation of the exchange rate for the amount",
+    "CLOSE": "Exit the section"
+  },
+  "expenses": {
+    "ADD_EXPENSE": "Adding expenses",
+    "SHOW_EXPENSES": "Displaying expenses"
+  },
+  "budget": {
+    "ADD_BUDGET": "Adding budget data",
+    "SHOW_BUDGET": "Displaying budget"
+  },
+  "currencies_2": {
+    "GET_QUOTES_ALL": "Get quote data for all pairs",
+    "GET_QUOTES": "Get data only for the current currency",
+    "EXIT": "Log out of the section"
+  },
+  "currencies_sum": {
+    "BACK_TO_CURRENCY_CHOOSE": " ◀ Will return to the currency selection",
+    "GET_BACK": "▲ Go back",
+    "GET_TOP": "To exit the section"
+  }
+}

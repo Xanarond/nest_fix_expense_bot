@@ -1,15 +1,12 @@
 import { Markup } from 'telegraf';
 
 export class BotButtons {
-  static startupButtons() {
+  static startupButtons(button_names: string[]) {
     return Markup.keyboard(
       [
-        Markup.button.callback('Ведение бюджета', 'budget'),
-        Markup.button.callback('Учёт расходов', 'expenses'),
-        Markup.button.callback(
-          'Получение или расчет суммы курсов валют',
-          'currency',
-        ),
+        Markup.button.callback(button_names[0], 'budget'),
+        Markup.button.callback(button_names[1], 'expenses'),
+        Markup.button.callback(button_names[2], 'currency'),
       ],
       {
         columns: 1,
@@ -17,12 +14,12 @@ export class BotButtons {
     );
   }
 
-  static showCommandsMenu() {
+  static showCommandsMenu(button_commands: string[]) {
     return Markup.inlineKeyboard(
       [
-        Markup.button.callback('Курсы Валют', 'currencies'),
-        Markup.button.callback('Расчет курса для суммы', 'currencies_sum'),
-        Markup.button.callback('▲ Выйти из раздела', 'close_count'),
+        Markup.button.callback(button_commands[0], 'currencies'),
+        Markup.button.callback(button_commands[1], 'currencies_sum'),
+        Markup.button.callback(button_commands[2], 'close_count'),
       ],
       {
         columns: 2,
@@ -49,11 +46,11 @@ export class BotButtons {
     );
   }
 
-  static showExpensesMenu() {
+  static showExpensesMenu(button_commands: string[]) {
     return Markup.inlineKeyboard(
       [
-        Markup.button.callback('Добавление расходов', 'add_expense'),
-        Markup.button.callback('Отображение расходов', 'show_expenses'),
+        Markup.button.callback(button_commands[0], 'add_expense'),
+        Markup.button.callback(button_commands[1], 'show_expenses'),
         /*Markup.button.callback('Редактировать расходы', 'update_expense'),
         Markup.button.callback('Добавить категорию расходов', 'add_category'),
         Markup.button.callback('Редактировать категорию', 'update_category'),*/
@@ -64,34 +61,36 @@ export class BotButtons {
     );
   }
 
-  static showBudgetOptions() {
+  static showBudgetOptions(button_commands: string[]) {
     return Markup.inlineKeyboard(
       [
-        Markup.button.callback('Добавление данных о бюджете', 'add_budget_sum'),
-        Markup.button.callback('Отображение бюджета', 'show_budget'),
+        Markup.button.callback(button_commands[0], 'add_budget_sum'),
+        Markup.button.callback(button_commands[1], 'show_budget'),
       ],
       {
         columns: 1,
       },
     );
   }
-  static showCurrenciesOptions() {
+  static showCurrenciesOptions(button_commands: string[]) {
     return Markup.inlineKeyboard(
       [
-        Markup.button.callback(
-          'Получить данные котировок по всем парам',
-          'all_currencies',
-        ),
-        Markup.button.callback(
-          'Получить данные только по текущей валюте',
-          'main_currency',
-        ),
-        Markup.button.callback('▲ Выйти из раздела', 'close_count'),
+        Markup.button.callback(button_commands[0], 'all_currencies'),
+        Markup.button.callback(button_commands[1], 'main_currency'),
+        Markup.button.callback(button_commands[2], 'close_count'),
       ],
       {
         columns: 1,
       },
     );
+  }
+
+  static showCurrenciesSumOptions(button_commands: string[]) {
+    return Markup.inlineKeyboard([
+      Markup.button.callback(button_commands[0], 'another_currency'),
+      Markup.button.callback(button_commands[1], 'currencies'),
+      Markup.button.callback(button_commands[2], 'close_count'),
+    ]);
   }
 
   static closeButtons() {

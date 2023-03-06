@@ -1,37 +1,43 @@
 import { Action, Ctx, InjectBot, On, Scene } from 'nestjs-telegraf';
-import { Context, Markup, Telegraf } from 'telegraf';
+import { Context, Telegraf } from 'telegraf';
 import { PostgresService } from '../../postgres/postgres.service';
 import { BotButtons } from '../bot.buttons';
 import { CurrenciesEntity } from '../../postgres/entities/currencies.entity';
 import { CryptoCurrency } from '../../currencies/currencies.service';
+import { I18nTranslateService } from '../../i18n/i18n.service';
 
 @Scene('currencies_sum')
 export class CurrenciesSum {
   private _postgres: PostgresService;
+  private _i18n: I18nTranslateService;
 
   constructor(
     @InjectBot() private bot: Telegraf<Context>,
     postgres: PostgresService,
+    i18n: I18nTranslateService,
   ) {
+    this._i18n = i18n;
     this._postgres = postgres;
   }
 
   @Action('currencies')
   async getCurrenciesCommands(@Ctx() ctx: Context) {
+    const language = ctx['session']['language'];
     await ctx.deleteMessage();
-    await ctx.reply('Выберите команду:', BotButtons.showCurrenciesOptions());
+    await ctx.reply(
+      await this._i18n.getShowCommands(language),
+      BotButtons.showCurrenciesOptions(
+        await this._i18n.commandsCurrencies(language),
+      ),
+    );
   }
 
   @Action('main_currency')
   async getMainCurrency(@Ctx() ctx: Context) {
     const main_currency = ctx['session']['selected_currency'];
-    if (!main_currency) {
-      await ctx.reply('Не удалось получить основную валюту');
-      return;
-    }
-
+    const language = ctx['session']['language'];
     await ctx.deleteMessage();
-    await ctx.reply('Вот актуальные курсы:');
+    await ctx.reply(await this._i18n.getCurrencies(language));
 
     let fiatData: CurrenciesEntity[];
     let cryptoData: CryptoCurrency[] = [];
@@ -48,44 +54,37 @@ export class CurrenciesSum {
     }
 
     const crypts = cryptoData.map(
-      ({ symbol, price }) => `<b>Пара: ${symbol} Курс: ${price}</b>\n`,
+      ({ symbol, price }) => `<b>${symbol} | ${price}</b>\n`,
     );
     const fiat_currencies = fiatData.map(
-      ({ couple, price }) => `<b>Пара: ${couple} Курс: ${price}</b>\n`,
+      ({ couple, price }) => `<b>${couple} | ${price}</b>\n`,
     );
 
     const main_currencies = [...crypts, ...fiat_currencies];
     if (main_currencies.length === 0) {
-      await ctx.reply('Нет информации на данный момент');
+      await ctx.reply(await this._i18n.getNoInfo(language));
       await ctx.reply(
-        'Вы можете ☟',
-        Markup.inlineKeyboard([
-          Markup.button.callback(
-            '◀ Вернутся к выбору валюты',
-            'another_currency',
-          ),
-          Markup.button.callback('▲ Перейти назад', 'currencies'),
-        ]),
+        await this._i18n.getCanChoose(language),
+        BotButtons.showCurrenciesSumOptions(
+          await this._i18n.commandsCurrenciesSum(language),
+        ),
       );
     } else {
       await ctx.replyWithHTML(main_currencies.join(''));
       await ctx.reply(
-        'Вы можете ☟',
-        Markup.inlineKeyboard([
-          Markup.button.callback(
-            '◀ Вернутся к выбору валюты',
-            'another_currency',
-          ),
-          Markup.button.callback('▲ Перейти назад', 'currencies'),
-        ]),
+        await this._i18n.getCanChoose(language),
+        BotButtons.showCurrenciesSumOptions(
+          await this._i18n.commandsCurrenciesSum(language),
+        ),
       );
     }
   }
 
   @Action('all_currencies')
   async getCurrencies(@Ctx() ctx: Context) {
+    const language = ctx['session']['language'];
     await ctx.deleteMessage();
-    await ctx.reply('Вот актуальные курсы:');
+    await ctx.reply(await this._i18n.getCurrencies(language));
 
     const [cryptoData, fiatData] = await Promise.all([
       await this._postgres.fetchCryptoCurrencyData(),
@@ -93,73 +92,72 @@ export class CurrenciesSum {
     ]);
 
     const crypts = cryptoData.map(
-      ({ symbol, price }) => `<b>Пара: ${symbol} Курс: ${price}</b>\n`,
+      ({ symbol, price }) => `<b>${symbol} | ${price}</b>\n`,
     );
     const fiat_currencies = fiatData.map(
-      ({ couple, price }) => `<b>Пара: ${couple} Курс: ${price}</b>\n`,
+      ({ couple, price }) => `<b>${couple} | ${price}</b>\n`,
     );
 
     const currencies = [...crypts, ...fiat_currencies];
 
     if (currencies.length === 0) {
-      await ctx.reply('Нет информации на данный момент');
+      await ctx.reply(await this._i18n.getNoInfo(language));
       await ctx.reply(
-        'Вы можете ☟',
-        Markup.inlineKeyboard([
-          Markup.button.callback(
-            '◀ Вернутся к выбору валюты',
-            'another_currency',
-          ),
-          Markup.button.callback('▲ Перейти назад', 'currencies'),
-          Markup.button.callback('▲ Выйти из раздела', 'close_count'),
-        ]),
+        await this._i18n.getCanChoose(language),
+        BotButtons.showCurrenciesSumOptions(
+          await this._i18n.commandsCurrenciesSum(language),
+        ),
       );
     }
 
     if (currencies.length !== 0) {
       await ctx.replyWithHTML(currencies.join(''));
       await ctx.reply(
-        'Вы можете ☟',
-        Markup.inlineKeyboard([
-          Markup.button.callback(
-            '◀ Вернутся к выбору валюты',
-            'another_currency',
-          ),
-          Markup.button.callback('▲ Перейти назад', 'currencies'),
-          Markup.button.callback('▲ Выйти из раздела', 'close_count'),
-        ]),
+        await this._i18n.getCanChoose(language),
+        BotButtons.showCurrenciesSumOptions(
+          await this._i18n.commandsCurrenciesSum(language),
+        ),
       );
     }
   }
 
   @Action('currencies_sum')
   async getCurrenciesSum(@Ctx() ctx: Context) {
+    const language = ctx['session']['language'];
     const main_currency = ctx['session']['selected_currency'];
     await ctx.deleteMessage();
-    await ctx.reply(`Доступные операции: +, *
-    Например: 100; 100.343 * 5; 5.34 + 300
-    Введите значения ${main_currency.toUpperCase()}:`);
+    await ctx.reply(
+      await this._i18n.getCurrencyAbout(language, main_currency.toUpperCase()),
+    );
   }
 
   @Action('another_currency')
   async getAnotherCurrency(@Ctx() ctx: Context) {
+    const language = ctx['session']['language'];
     await ctx.deleteMessage();
     await ctx['scene'].enter('def_currency');
     await ctx.reply(
-      '💳 Выберите основную валюту для дальнейшего расчета:',
+      await this._i18n.getDefaultCurrency(language),
       BotButtons.showCurrencyMenu(),
     );
   }
 
   @Action('close_count')
   async exitFromCounting(@Ctx() ctx: Context) {
+    const language = ctx['session']['language'];
     await ctx.deleteMessage();
     await ctx['scene'].leave();
-    await ctx.reply('☟ Выберите опцию из списка', BotButtons.startupButtons());
+    await ctx.reply(
+      await this._i18n.getChooseCommands(language),
+      BotButtons.startupButtons(
+        await this._i18n.startupButtons(ctx['session']['language']),
+      ),
+    );
   }
 
   @On('text')
   async countSum(@Ctx() ctx: Context) {
+    const language = ctx['session']['language'];
     const { message } = ctx;
     const sum_regexp = RegExp(`^(\\d+(\\.\\d{1,3})?)`);
 
@@ -172,18 +170,15 @@ export class CurrenciesSum {
       !message['text'].match(sum_regexp) &&
       !message['text'].match(operation_regexp)
     ) {
-      await ctx.reply('Проверьте правильность вводимых данных!');
+      await ctx.reply(await this._i18n.getNotCorrect(language));
       return;
     }
 
     if (message['text'].match(sum_regexp)) {
-      console.log('сумма совпала');
       input += parseFloat(message['text']);
-      console.log(input);
     }
 
     if (message['text'].match(operation_regexp)) {
-      console.log(message['text'].split(' '));
       const template = message['text'].split(' ');
       if (template[1] === '+') {
         input = parseFloat(template[0]) + parseFloat(template[2]);
@@ -192,20 +187,16 @@ export class CurrenciesSum {
         input = parseFloat(template[0]) * parseFloat(template[2]);
       }
       if (template.length <= 1) {
-        await ctx.reply('Проверьте правильность вводимых данных!');
+        await ctx.reply(await this._i18n.getNotCorrect(language));
         return;
       }
-      console.log('совпадает');
     }
     const select_cur = ctx['session']['selected_currency'];
     if (!select_cur) {
       return;
     }
 
-    console.log(input);
-
     const cryptoData = await this._postgres.fetchCryptoCurrencyData();
-
     const currencies_sum = await this._postgres.fetchFiatCurrencyData();
 
     const filtered_currencies = currencies_sum.filter(
@@ -215,34 +206,33 @@ export class CurrenciesSum {
     );
 
     if (filtered_currencies.length === 0) {
-      await ctx.reply('Нет информации на данный момент');
+      await ctx.reply(await this._i18n.getNoInfo(language));
     } else {
       const currencies = [];
       filtered_currencies.map((currency: CurrenciesEntity) => {
         const rate =
           parseFloat(String(currency.price)) * parseFloat(String(input));
-        currencies.push(
-          `<b>Пара: ${currency.couple} Курс: ${rate.toFixed(3)}</b>\n`,
-        );
+        currencies.push(`<b>${currency.couple} | ${rate.toFixed(3)}</b>\n`);
       });
       if (ctx['session']['selected_currency'] === 'usd') {
         cryptoData.map(({ symbol, price }) => {
           const rate = parseFloat(String(input)) / parseFloat(String(price));
-          currencies.push(`<b>Пара: ${symbol} Курс: ${rate.toFixed(3)}</b>\n`);
+          currencies.push(`<b>${symbol} | ${rate.toFixed(3)}</b>\n`);
         });
       }
       await ctx.reply(
-        `Ваше значение: ${input} ${ctx['session'][
-          'selected_currency'
-        ].toUpperCase()}`,
+        await this._i18n.getCurrentValue(
+          language,
+          input,
+          ctx['session']['selected_currency'].toUpperCase(),
+        ),
       );
       await ctx.replyWithHTML(currencies.join(''));
       await ctx.reply(
-        'Вы можете продолжать вводить суммы либо:',
-        Markup.inlineKeyboard([
-          Markup.button.callback('◀ Выбрать другую валюту', 'another_currency'),
-          Markup.button.callback('▲ Выйти из режима', 'close_count'),
-        ]),
+        await this._i18n.getSumsDilemma(language),
+        BotButtons.showCurrenciesSumOptions(
+          await this._i18n.commandsCurrenciesSum(language),
+        ),
       );
     }
   }

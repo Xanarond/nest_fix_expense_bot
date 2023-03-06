@@ -31,6 +31,10 @@ export type Expenses = {
   currency: string;
 };
 
+export type Categories = {
+  category_id: number;
+  category: string;
+};
 @Injectable()
 export class PostgresService {
   private currenciesService: CurrenciesService;
@@ -126,8 +130,40 @@ WHERE COSTS."telegramUserIdTelegramId" = ${id}`,
     return this.costsRepository.insert(costs);
   }
 
-  async showCategories(): Promise<CategoriesEntity[]> {
-    return await this.categoriesRepository.find();
+  async showCategories(lang: string): Promise<Categories[]> {
+    const categories = [];
+    if (lang === 'ru') {
+      await this.categoriesRepository
+        .find({
+          select: ['category_id', 'category'],
+        })
+        .then((value: CategoriesEntity[]) =>
+          value.map((el: CategoriesEntity) => {
+            const entity = {
+              category_id: el.category_id,
+              category: el.category,
+            };
+            categories.push(entity);
+          }),
+        );
+    }
+    if (lang === 'en') {
+      await this.categoriesRepository
+        .find({
+          select: ['category_id', 'category_en'],
+        })
+        .then((value: CategoriesEntity[]) =>
+          value.map((el: CategoriesEntity) => {
+            const entity = {
+              category_id: el.category_id,
+              category: el.category_en,
+            };
+            categories.push(entity);
+          }),
+        );
+    }
+    console.log(categories, lang);
+    return categories;
   }
 
   async insertBudgetSum(budget: BudgetsEntity) {

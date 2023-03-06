@@ -11,6 +11,7 @@ import { TelegramUsers } from './postgres/entities/telegram_users.entity';
 import { CategoriesEntity } from './postgres/entities/categories.entity';
 import { CostsEntity } from './postgres/entities/costs.entity';
 import { BudgetsEntity } from './postgres/entities/budgets.entity';
+import { I18nTranslateModule } from './i18n/i18n.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { BudgetsEntity } from './postgres/entities/budgets.entity';
       ],
       synchronize: true,
     }),
+    I18nTranslateModule,
   ],
   controllers: [AppController],
   providers: [AppService],
