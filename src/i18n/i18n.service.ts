@@ -30,6 +30,10 @@ export class I18nTranslateService {
     return await this.i18nService.t('main.CHOOSE_OPT', { lang });
   }
 
+  async getChooseLanguage(lang: string): Promise<string> {
+    return await this.i18nService.t('main.CHOOSE_LANG', { lang });
+  }
+
   async getDefaultCurrency(lang: string): Promise<string> {
     return await this.i18nService.t('main.DEFAULT_CURRENCY', { lang });
   }

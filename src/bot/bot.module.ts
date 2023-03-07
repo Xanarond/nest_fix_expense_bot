@@ -8,6 +8,7 @@ import { ExpensesScene } from './scenes/expenses.scene';
 import { BudgetScene } from './scenes/budget.scene';
 import { DefaultCurrency } from './scenes/default_currency';
 import { I18nTranslateModule } from '../i18n/i18n.module';
+import { BotLanguage } from './scenes/bot_language';
 
 const sessions = new LocalSession({ database: 'session.json' });
 
@@ -28,6 +29,7 @@ const sessions = new LocalSession({ database: 'session.json' });
     CurrenciesSum,
     BudgetScene,
     DefaultCurrency,
+    BotLanguage,
   ],
 })
 export class BotModule {}

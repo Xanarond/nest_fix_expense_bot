@@ -2,6 +2,7 @@
   "WELCOME": "<b>Welcome {first_name} {last_name} to the budget counting bot</b>",
   "HELP": "<b>Welcome to the help of the expense calculation bot</b>\n 1. <i>/commands</i> Getting a list of bot commands \n All wishes and questions: @xanarond",
   "CHOOSE_OPT": "☟ Select an option from the list",
+  "CHOOSE_LANG": "Choose bot language ☟",
   "DEFAULT_CURRENCY": "\uD83D\uDCB3 Select the main currency for further calculation:",
   "SHOW_COMMANDS": "☟ Here are the main commands:",
   "MAIN_CURRENCY": "The main currency for calculating the exchange rate has become {currency}",

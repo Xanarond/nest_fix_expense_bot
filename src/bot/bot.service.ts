@@ -48,7 +48,7 @@ export class BotService {
     await ctx.replyWithHTML(
       await this._i18n.getWelcome(this._telegram_user),
       BotButtons.startupButtons(
-        await this._i18n.startupButtons(ctx['session']['_language']),
+        await this._i18n.startupButtons(ctx['session']['language']),
       ),
     );
   }
@@ -56,7 +56,7 @@ export class BotService {
   @Help()
   async help(@Ctx() ctx: Context) {
     await ctx.replyWithHTML(
-      await this._i18n.getHelp(ctx['session']['_language']),
+      await this._i18n.getHelp(ctx['session']['language']),
     );
   }
 
@@ -67,6 +67,16 @@ export class BotService {
       BotButtons.startupButtons(
         await this._i18n.startupButtons(ctx['session']['language']),
       ),
+    );
+  }
+
+  @Command('lang')
+  async getBotLanguage(@Ctx() ctx: Context) {
+    await ctx.deleteMessage();
+    await ctx['scene'].enter('lang');
+    await ctx.reply(
+      await this._i18n.getChooseLanguage(ctx['session']['language']),
+      BotButtons.chooseLanguage(),
     );
   }
   @Hears([

@@ -14,6 +14,13 @@ export class BotButtons {
     );
   }
 
+  static chooseLanguage() {
+    return Markup.inlineKeyboard([
+      Markup.button.callback('RU', 'ru'),
+      Markup.button.callback('EN', 'en'),
+    ]);
+  }
+
   static showCommandsMenu(button_commands: string[]) {
     return Markup.inlineKeyboard(
       [
