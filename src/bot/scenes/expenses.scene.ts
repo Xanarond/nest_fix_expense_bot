@@ -2,7 +2,6 @@ import { Action, Ctx, Hears, InjectBot, Scene } from 'nestjs-telegraf';
 import {
   Budget,
   Categories,
-  Expenses,
   PostgresService,
 } from '../../postgres/postgres.service';
 import { Context, Telegraf } from 'telegraf';
@@ -10,6 +9,7 @@ import { CostsEntity } from '../../postgres/entities/costs.entity';
 import { DateTime } from 'luxon';
 import { BudgetsEntity } from '../../postgres/entities/budgets.entity';
 import { I18nTranslateService } from '../../i18n/i18n.service';
+import { BotButtons } from '../bot.buttons';
 @Scene('expenses')
 export class ExpensesScene {
   private _postgres: PostgresService;
@@ -29,31 +29,16 @@ export class ExpensesScene {
   }
 
   @Action('show_expenses')
-  async showExpenses(@Ctx() ctx: Context) {
+  async getExpensesPeriods(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
-    const telegram_id = ctx.callbackQuery.from.id;
-
-    const resp = [];
-
-    await this._postgres
-      .getExpenses(telegram_id)
-      .then(async (res: Expenses[]) => {
-        res.map((value: Expenses) => {
-          resp.push(
-            `<b>${value.date} ${value.expense_sum} ${value.currency} ${value.category}</b>\n`,
-          );
-        });
-        if (resp.length === 0) {
-          return ctx.reply(
-            await this._i18n.getExpensesNo(ctx['session']['language']),
-          );
-        } else {
-          await ctx.reply(
-            await this._i18n.getExpensesInfo(ctx['session']['language']),
-          );
-          return await ctx.replyWithHTML(resp.join(''));
-        }
-      });
+    const language = ctx['session']['language'];
+    await ctx['scene'].enter('period');
+    await ctx.reply(
+      await this._i18n.getChooseCommands(language),
+      BotButtons.showExpensesPeriod(
+        await this._i18n.commandsExpensesPeriods(language),
+      ),
+    );
   }
 
   @Action('add_expense')

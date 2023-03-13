@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
-import { TelegramUsers } from '../postgres/entities/telegram_users.entity';
-import { I18nTranslations } from '../generated/i18n.generated';
+import { TelegramUser } from '../postgres/entities/telegram_users.entity';
+import { I18nTranslations } from './generated/i18n.generated';
 
-// <I18nTranslations>
+export type ButtonsLocalNames = string;
+
 @Injectable()
 export class I18nTranslateService {
   constructor(private readonly i18nService: I18nService<I18nTranslations>) {}
@@ -12,7 +13,7 @@ export class I18nTranslateService {
     language,
     first_name,
     last_name,
-  }: TelegramUsers): Promise<string> {
+  }: TelegramUser): Promise<string> {
     return await this.i18nService.t('main.WELCOME', {
       lang: language,
       args: {
@@ -129,7 +130,7 @@ export class I18nTranslateService {
       lang,
     });
   }
-  async startupButtons(lang: string): Promise<string[]> {
+  async startupButtons(lang: string): Promise<ButtonsLocalNames[]> {
     return [
       await this.i18nService.t('buttons.main_keyboard.BUDGET', {
         lang,
@@ -143,7 +144,7 @@ export class I18nTranslateService {
     ];
   }
 
-  async commandsMenuButtons(lang: string): Promise<string[]> {
+  async commandsMenuButtons(lang: string): Promise<ButtonsLocalNames[]> {
     return [
       await this.i18nService.translate('buttons.currencies.EXCHANGE', {
         lang,
@@ -157,7 +158,7 @@ export class I18nTranslateService {
     ];
   }
 
-  async commandsExpenses(lang: string): Promise<string[]> {
+  async commandsExpenses(lang: string): Promise<ButtonsLocalNames[]> {
     return [
       await this.i18nService.translate('buttons.expenses.ADD_EXPENSE', {
         lang,
@@ -168,7 +169,7 @@ export class I18nTranslateService {
     ];
   }
 
-  async commandsBudget(lang: string): Promise<string[]> {
+  async commandsBudget(lang: string): Promise<ButtonsLocalNames[]> {
     return [
       await this.i18nService.translate('buttons.budget.ADD_BUDGET', {
         lang,
@@ -179,7 +180,7 @@ export class I18nTranslateService {
     ];
   }
 
-  async commandsCurrencies(lang: string): Promise<string[]> {
+  async commandsCurrencies(lang: string): Promise<ButtonsLocalNames[]> {
     return [
       await this.i18nService.translate('buttons.currencies_2.GET_QUOTES_ALL', {
         lang,
@@ -193,7 +194,7 @@ export class I18nTranslateService {
     ];
   }
 
-  async commandsCurrenciesSum(lang: string): Promise<string[]> {
+  async commandsCurrenciesSum(lang: string): Promise<ButtonsLocalNames[]> {
     return [
       await this.i18nService.translate(
         'buttons.currencies_sum.BACK_TO_CURRENCY_CHOOSE',
@@ -205,6 +206,31 @@ export class I18nTranslateService {
         lang,
       }),
       await this.i18nService.translate('buttons.currencies_sum.GET_TOP', {
+        lang,
+      }),
+    ];
+  }
+  async commandsExpensesPeriods(lang: string): Promise<ButtonsLocalNames[]> {
+    return [
+      await this.i18nService.translate('buttons.expenses_periods.WEEK', {
+        lang,
+      }),
+      await this.i18nService.translate('buttons.expenses_periods.TWO_WEEKS', {
+        lang,
+      }),
+      await this.i18nService.translate('buttons.expenses_periods.MONTH', {
+        lang,
+      }),
+      await this.i18nService.translate(
+        'buttons.expenses_periods.THREE_MONTHS',
+        {
+          lang,
+        },
+      ),
+      await this.i18nService.translate('buttons.expenses_periods.SIX_MONTHS', {
+        lang,
+      }),
+      await this.i18nService.translate('buttons.expenses_periods.YEAR', {
         lang,
       }),
     ];

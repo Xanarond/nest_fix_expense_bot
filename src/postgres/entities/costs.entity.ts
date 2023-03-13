@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { CategoriesEntity } from './categories.entity';
-import { TelegramUsers } from './telegram_users.entity';
+import { TelegramUser } from './telegram_users.entity';
 
 @Entity('costs')
 export class CostsEntity {
@@ -22,6 +22,6 @@ export class CostsEntity {
   )
   expense_id: number;
 
-  @ManyToOne(() => TelegramUsers, (users: TelegramUsers) => users.telegram_id)
+  @ManyToOne(() => TelegramUser, (users: TelegramUser) => users.telegram_id)
   telegram_user_id: number;
 }

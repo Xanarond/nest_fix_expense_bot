@@ -18,7 +18,7 @@ import * as path from 'path';
         },
         AcceptLanguageResolver,
       ],
-      typesOutputPath: 'src/generated/i18n.generated.ts',
+      typesOutputPath: 'src/i18n/generated/i18n.generated.ts',
     }),
   ],
   providers: [I18nTranslateService],

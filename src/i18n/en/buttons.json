@@ -26,5 +26,13 @@
     "BACK_TO_CURRENCY_CHOOSE": " ◀ Will return to the currency selection",
     "GET_BACK": "▲ Go back",
     "GET_TOP": "To exit the section"
+  },
+  "expenses_periods": {
+    "WEEK": "Week",
+    "TWO_WEEKS": "2 Weeks",
+    "MONTH": "Month",
+    "THREE_MONTHS": "3 Months",
+    "SIX_MONTHS": "6 Months",
+    "YEAR": "Year"
   }
 }

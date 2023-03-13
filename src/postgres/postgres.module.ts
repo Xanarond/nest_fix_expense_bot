@@ -3,7 +3,7 @@ import { PostgresService } from './postgres.service';
 import { CurrenciesModule } from '../currencies/currencies.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CurrenciesEntity } from './entities/currencies.entity';
-import { TelegramUsers } from './entities/telegram_users.entity';
+import { TelegramUser } from './entities/telegram_users.entity';
 import { CategoriesEntity } from './entities/categories.entity';
 import { CostsEntity } from './entities/costs.entity';
 import { BudgetsEntity } from './entities/budgets.entity';
@@ -13,7 +13,7 @@ import { BudgetsEntity } from './entities/budgets.entity';
     CurrenciesModule,
     TypeOrmModule.forFeature([
       CurrenciesEntity,
-      TelegramUsers,
+      TelegramUser,
       CategoriesEntity,
       CostsEntity,
       BudgetsEntity,

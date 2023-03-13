@@ -1,6 +1,6 @@
 {
   "WELCOME": "<b>Welcome {first_name} {last_name} to the budget counting bot</b>",
-  "HELP": "<b>Welcome to the help of the expense calculation bot</b>\n 1. <i>/commands</i> Getting a list of bot commands \n All wishes and questions: @xanarond",
+  "HELP": "<b>Welcome to the help of the expense calculation bot</b>\n 1. <i>/commands</i> Getting a list of bot commands \n All wishes and questions: @xanarond \n Support the project:\n Binance Pay ID: 204196788\n USDT(BEP20): 0x4bebcc88cd013d0dbbaa5fcf7ca483245d1054e4 \n USDT(ERС20): 0x4bebcc88cd013d0dbbaa5fcf7ca483245d1054e4",
   "CHOOSE_OPT": "☟ Select an option from the list",
   "CHOOSE_LANG": "Choose bot language ☟",
   "DEFAULT_CURRENCY": "\uD83D\uDCB3 Select the main currency for further calculation:",
@@ -20,7 +20,7 @@
     "ABOUT": "Enter data in this format:\n 100.50 VAL or 1 VAL where the amount can be either an integer or a fractional number, and VAL - currency.\n Example of currencies: USD, EUR, ILS, BTC, ETH, USDT, etc. \n Example of input data: 100.50 USD or 100 EUR"
   },
   "expenses": {
-    "NO_EXPENSES": "Congratulations, you don't have any expenses yet!",
+    "NO_EXPENSES": "Congratulations, you don't have any expenses for the current period yet!",
     "EXPENSES_INFO": "Here is the data on your expenses:",
     "CATEGORIES": "Here is the list of available categories:",
     "FORMAT": "{categories} Enter data in the format: 1 01-01-2023 200 USD\n Where 1 is the category number\n 01-01-2023 is the format of the date to be entered\n 200(1.324) is the format of the input expenses can be either integer or fractional \n USD is the currency format",

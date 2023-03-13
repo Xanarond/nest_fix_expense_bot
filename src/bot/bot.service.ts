@@ -10,14 +10,23 @@ import {
 import { Context, Telegraf } from 'telegraf';
 import { BotButtons } from './bot.buttons';
 import { PostgresService } from '../postgres/postgres.service';
-import { TelegramUsers } from '../postgres/entities/telegram_users.entity';
+import { TelegramUser } from '../postgres/entities/telegram_users.entity';
 import { I18nTranslateService } from '../i18n/i18n.service';
+
+const CURRENCIES_COMMANDS = [
+  'Получение или расчет суммы курсов валют',
+  'Receiving or calculating the amount of exchange rates',
+];
+
+const EXPENSES_COMMANDS = ['Учёт расходов', 'Expense accounting'];
+
+const BUDGET_COMMANDS = ['Ведение бюджета', 'Budget management'];
 
 @Update()
 export class BotService {
   private _postgres: PostgresService;
   private readonly _i18n: I18nTranslateService;
-  private _telegram_user: TelegramUsers;
+  private _telegram_user: TelegramUser;
 
   constructor(
     @InjectBot() private bot: Telegraf<Context>,
@@ -34,7 +43,7 @@ export class BotService {
     ctx['session']['expense_indicator'] = false;
     ctx['session']['language'] = ctx.message.from.language_code;
 
-    const telegram_user = new TelegramUsers();
+    const telegram_user = new TelegramUser();
     telegram_user.telegram_id = ctx.message.from.id;
     telegram_user.first_name = ctx.message.from.first_name;
     telegram_user.username = ctx.message.from.username;
@@ -79,10 +88,7 @@ export class BotService {
       BotButtons.chooseLanguage(),
     );
   }
-  @Hears([
-    'Получение или расчет суммы курсов валют',
-    'Receiving or calculating the amount of exchange rates',
-  ])
+  @Hears([...CURRENCIES_COMMANDS])
   async getCommand(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
     await ctx['scene'].enter('def_currency');
@@ -92,7 +98,7 @@ export class BotService {
     );
   }
 
-  @Hears(['Учёт расходов', 'Expense accounting'])
+  @Hears([...EXPENSES_COMMANDS])
   async getCostsCommands(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
     await ctx['scene'].enter('expenses');
@@ -104,7 +110,7 @@ export class BotService {
     );
   }
 
-  @Hears(['Ведение бюджета', 'Budget management'])
+  @Hears([...BUDGET_COMMANDS])
   async getCommands(@Ctx() ctx: Context) {
     await ctx.deleteMessage();
     await ctx['scene'].enter('budget');

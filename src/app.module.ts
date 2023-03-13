@@ -7,7 +7,7 @@ import { CurrenciesModule } from './currencies/currencies.module';
 import { PostgresModule } from './postgres/postgres.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CurrenciesEntity } from './postgres/entities/currencies.entity';
-import { TelegramUsers } from './postgres/entities/telegram_users.entity';
+import { TelegramUser } from './postgres/entities/telegram_users.entity';
 import { CategoriesEntity } from './postgres/entities/categories.entity';
 import { CostsEntity } from './postgres/entities/costs.entity';
 import { BudgetsEntity } from './postgres/entities/budgets.entity';
@@ -28,7 +28,7 @@ import { I18nTranslateModule } from './i18n/i18n.module';
       database: process.env.DB_MAIN,
       entities: [
         CurrenciesEntity,
-        TelegramUsers,
+        TelegramUser,
         CategoriesEntity,
         CostsEntity,
         BudgetsEntity,

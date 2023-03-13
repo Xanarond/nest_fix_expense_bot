@@ -11,12 +11,12 @@ import {
   Currency,
 } from '../currencies/currencies.service';
 import { DateTime } from 'luxon';
-import { TelegramUsers } from './entities/telegram_users.entity';
+import { TelegramUser } from './entities/telegram_users.entity';
 import { CategoriesEntity } from './entities/categories.entity';
 import { generate_categories } from './queries/categories';
 import { CostsEntity } from './entities/costs.entity';
 import { BudgetsEntity } from './entities/budgets.entity';
-import { lastValueFrom, map, Subscription } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { FIAT_CURRENCIES } from '../currencies/currencies.constants';
 
 export type Budget = {
@@ -27,7 +27,7 @@ export type Budget = {
 export type Expenses = {
   date: string;
   expense_sum: number;
-  category: string;
+  category?: string;
   currency: string;
 };
 
@@ -42,8 +42,8 @@ export class PostgresService {
   constructor(
     @InjectRepository(CurrenciesEntity)
     private readonly currenciesRepository: Repository<CurrenciesEntity>,
-    @InjectRepository(TelegramUsers)
-    private readonly telegramUserRepository: Repository<TelegramUsers>,
+    @InjectRepository(TelegramUser)
+    private readonly telegramUserRepository: Repository<TelegramUser>,
     @InjectRepository(CategoriesEntity)
     private readonly categoriesRepository: Repository<CategoriesEntity>,
     @InjectRepository(BudgetsEntity)
@@ -111,19 +111,59 @@ export class PostgresService {
       });
   }
 
-  async loginTelegramBot(telegram_user: TelegramUsers) {
+  async loginTelegramBot(telegram_user: TelegramUser) {
     return this.telegramUserRepository.upsert(telegram_user, ['telegram_id']);
   }
 
-  async getExpenses(id: number): Promise<Expenses[]> {
-    return await this.costsRepository.query(
-      `SELECT to_char(date, 'DD-MM-YYYY') as date, EXPENSE_SUM,
-        CATEGORIES.CATEGORY, 
-        CURRENCY
-        FROM public.COSTS
-LEFT JOIN PUBLIC.CATEGORIES ON CATEGORIES.CATEGORY_ID = COSTS."expenseIdCategoryId"
-WHERE COSTS."telegramUserIdTelegramId" = ${id}`,
-    );
+  async getExpenses(
+    id: number,
+    period: string,
+    language: string,
+  ): Promise<Expenses[]> {
+    const CATEGORY =
+      language === 'ru' ? 'CATEGORIES.CATEGORY' : 'CATEGORIES.CATEGORY_EN';
+
+    let PERIOD = '';
+
+    switch (period) {
+      case 'w':
+        PERIOD = '1 week';
+        break;
+      case 'w2':
+        PERIOD = '2 weeks';
+        break;
+      case 'm':
+        PERIOD = '1 month';
+        break;
+      case 'm3':
+        PERIOD = '3 months';
+        break;
+      case 'm6':
+        PERIOD = '6 months';
+        break;
+      case 'y':
+        PERIOD = '1 year';
+        break;
+      default:
+        break;
+    }
+
+    return await this.costsRepository
+      .createQueryBuilder('expenses')
+      .leftJoinAndSelect(
+        'expenses.expense_id',
+        'categories',
+        `CATEGORIES.CATEGORY_ID = expenses.expenseIdCategoryId`,
+      )
+      .where('expenses.telegramUserIdTelegramId = :id', { id })
+      .andWhere(`expenses.date > NOW() - INTERVAL '${PERIOD}'`)
+      .select([
+        `to_char(expenses.date, 'DD-MM-YYYY') as date`,
+        'expense_sum',
+        `${CATEGORY} as category`,
+        `currency`,
+      ])
+      .getRawMany();
   }
 
   insertNewCosts(costs: CostsEntity) {
@@ -131,39 +171,14 @@ WHERE COSTS."telegramUserIdTelegramId" = ${id}`,
   }
 
   async showCategories(lang: string): Promise<Categories[]> {
-    const categories = [];
-    if (lang === 'ru') {
-      await this.categoriesRepository
-        .find({
-          select: ['category_id', 'category'],
-        })
-        .then((value: CategoriesEntity[]) =>
-          value.map((el: CategoriesEntity) => {
-            const entity = {
-              category_id: el.category_id,
-              category: el.category,
-            };
-            categories.push(entity);
-          }),
-        );
-    }
-    if (lang === 'en') {
-      await this.categoriesRepository
-        .find({
-          select: ['category_id', 'category_en'],
-        })
-        .then((value: CategoriesEntity[]) =>
-          value.map((el: CategoriesEntity) => {
-            const entity = {
-              category_id: el.category_id,
-              category: el.category_en,
-            };
-            categories.push(entity);
-          }),
-        );
-    }
-    console.log(categories, lang);
-    return categories;
+    const select = lang === 'en' ? 'category_en' : 'category';
+    const categories = await this.categoriesRepository.find({
+      select: ['category_id', select],
+    });
+    return categories.map((el: CategoriesEntity) => ({
+      category_id: el.category_id,
+      category: el[select],
+    }));
   }
 
   async insertBudgetSum(budget: BudgetsEntity) {

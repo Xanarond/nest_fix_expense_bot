@@ -26,5 +26,13 @@
     "BACK_TO_CURRENCY_CHOOSE": "◀ Вернутся к выбору валюты",
     "GET_BACK": "▲ Перейти назад",
     "GET_TOP": "▲ Выйти из раздела"
+  },
+  "expenses_periods": {
+    "WEEK": "Неделя",
+    "TWO_WEEKS": "2 Недели",
+    "MONTH": "Месяц",
+    "THREE_MONTHS": "3 Месяца",
+    "SIX_MONTHS": "6 Месяцев",
+    "YEAR": "Год"
   }
 }

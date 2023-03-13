@@ -31,6 +31,14 @@ export type I18nTranslations = {
             "GET_BACK": string;
             "GET_TOP": string;
         };
+        "expenses_periods": {
+            "WEEK": string;
+            "TWO_WEEKS": string;
+            "MONTH": string;
+            "THREE_MONTHS": string;
+            "SIX_MONTHS": string;
+            "YEAR": string;
+        };
     };
     "main": {
         "WELCOME": string;

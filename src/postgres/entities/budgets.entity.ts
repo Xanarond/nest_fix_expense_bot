@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { TelegramUsers } from './telegram_users.entity';
+import { TelegramUser } from './telegram_users.entity';
 
 @Entity('budgets')
 @Unique(['currency'])
@@ -17,6 +17,6 @@ export class BudgetsEntity {
   @Column({ type: 'float' })
   count: string;
 
-  @ManyToOne(() => TelegramUsers, (users: TelegramUsers) => users.telegram_id)
+  @ManyToOne(() => TelegramUser, (users: TelegramUser) => users.telegram_id)
   belong: number;
 }

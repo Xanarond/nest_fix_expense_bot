@@ -1,7 +1,8 @@
 import { Markup } from 'telegraf';
+import { ButtonsLocalNames } from '../i18n/i18n.service';
 
 export class BotButtons {
-  static startupButtons(button_names: string[]) {
+  static startupButtons(button_names: ButtonsLocalNames[]) {
     return Markup.keyboard(
       [
         Markup.button.callback(button_names[0], 'budget'),
@@ -21,7 +22,7 @@ export class BotButtons {
     ]);
   }
 
-  static showCommandsMenu(button_commands: string[]) {
+  static showCommandsMenu(button_commands: ButtonsLocalNames[]) {
     return Markup.inlineKeyboard(
       [
         Markup.button.callback(button_commands[0], 'currencies'),
@@ -53,14 +54,11 @@ export class BotButtons {
     );
   }
 
-  static showExpensesMenu(button_commands: string[]) {
+  static showExpensesMenu(button_commands: ButtonsLocalNames[]) {
     return Markup.inlineKeyboard(
       [
         Markup.button.callback(button_commands[0], 'add_expense'),
         Markup.button.callback(button_commands[1], 'show_expenses'),
-        /*Markup.button.callback('Редактировать расходы', 'update_expense'),
-        Markup.button.callback('Добавить категорию расходов', 'add_category'),
-        Markup.button.callback('Редактировать категорию', 'update_category'),*/
       ],
       {
         columns: 1,
@@ -68,7 +66,7 @@ export class BotButtons {
     );
   }
 
-  static showBudgetOptions(button_commands: string[]) {
+  static showBudgetOptions(button_commands: ButtonsLocalNames[]) {
     return Markup.inlineKeyboard(
       [
         Markup.button.callback(button_commands[0], 'add_budget_sum'),
@@ -79,7 +77,7 @@ export class BotButtons {
       },
     );
   }
-  static showCurrenciesOptions(button_commands: string[]) {
+  static showCurrenciesOptions(button_commands: ButtonsLocalNames[]) {
     return Markup.inlineKeyboard(
       [
         Markup.button.callback(button_commands[0], 'all_currencies'),
@@ -92,7 +90,7 @@ export class BotButtons {
     );
   }
 
-  static showCurrenciesSumOptions(button_commands: string[]) {
+  static showCurrenciesSumOptions(button_commands: ButtonsLocalNames[]) {
     return Markup.inlineKeyboard([
       Markup.button.callback(button_commands[0], 'another_currency'),
       Markup.button.callback(button_commands[1], 'currencies'),
@@ -100,7 +98,19 @@ export class BotButtons {
     ]);
   }
 
-  static closeButtons() {
-    return Markup.removeKeyboard();
+  static showExpensesPeriod(button_commands: ButtonsLocalNames[]) {
+    return Markup.inlineKeyboard(
+      [
+        Markup.button.callback(button_commands[0], 'w'),
+        Markup.button.callback(button_commands[1], 'w2'),
+        Markup.button.callback(button_commands[2], 'm'),
+        Markup.button.callback(button_commands[3], 'm3'),
+        Markup.button.callback(button_commands[4], 'm6'),
+        Markup.button.callback(button_commands[5], 'y'),
+      ],
+      {
+        columns: 2,
+      },
+    );
   }
 }

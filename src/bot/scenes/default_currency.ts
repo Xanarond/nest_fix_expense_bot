@@ -2,12 +2,25 @@ import { Action, Ctx, Scene } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 import { BotButtons } from '../bot.buttons';
 import { I18nTranslateService } from '../../i18n/i18n.service';
+
+const DEFAULT_CURRENCY = [
+  'amd',
+  'azn',
+  'rub',
+  'usd',
+  'eur',
+  'ils',
+  'aed',
+  'try',
+  'gel',
+];
+
 @Scene('def_currency')
 export class DefaultCurrency {
   constructor(private i18n: I18nTranslateService) {
     this.i18n = i18n;
   }
-  @Action(['amd', 'azn', 'rub', 'usd', 'eur', 'ils', 'aed', 'try', 'gel'])
+  @Action([...DEFAULT_CURRENCY])
   async getAzn(@Ctx() ctx: Context) {
     ctx['session']['selected_currency'] = '';
     const language = ctx['session']['language'];
