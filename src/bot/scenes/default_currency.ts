@@ -13,6 +13,9 @@ const DEFAULT_CURRENCY = [
   'aed',
   'try',
   'gel',
+  'kzt',
+  'gbp',
+  'cny',
 ];
 
 @Scene('def_currency')

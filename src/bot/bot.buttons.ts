@@ -47,6 +47,9 @@ export class BotButtons {
         Markup.button.callback('TRY', 'try'),
         Markup.button.callback('GEL', 'gel'),
         Markup.button.callback('AMD', 'amd'),
+        Markup.button.callback('KZT', 'kzt'),
+        Markup.button.callback('GBP', 'gbp'),
+        Markup.button.callback('CNY', 'cny'),
       ],
       {
         columns: 3,

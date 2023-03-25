@@ -214,7 +214,9 @@ export class CurrenciesSum {
           parseFloat(String(currency.price)) * parseFloat(String(input));
         currencies.push(`<b>${currency.couple} | ${rate.toFixed(3)}</b>\n`);
       });
-      if (ctx['session']['selected_currency'] === 'usd') {
+      if (
+        ctx['session']['selected_currency'] === 'usd'
+      ) {
         cryptoData.map(({ symbol, price }) => {
           const rate = parseFloat(String(input)) / parseFloat(String(price));
           currencies.push(`<b>${symbol} | ${rate.toFixed(3)}</b>\n`);
